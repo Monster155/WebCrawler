@@ -11,6 +11,7 @@ index_file_name = "index.txt"
 
 all_tokens_file = "tokens.txt"
 lemmas_tokens_file = "lemmas.txt"
+inverted_indexes_file = "inverted_indexes.txt"
 
 """ task 1 """
 
@@ -44,12 +45,14 @@ if not is_skip_downloading:
 """ task 2 """
 
 useful_tags = ['ADJ', 'NOUN', 'PROPN', 'VERB']
-final_words_tokens = []
 
 segmenter = Segmenter()
 morph_vocab = MorphVocab()
 emb = NewsEmbedding()
 morph_tagger = NewsMorphTagger(emb)
+
+all_lemmas = {}
+all_lemmas_indexes = {}
 
 for i in range(0, 100):
     f = open(files_folder + str(i) + ".txt", 'r', encoding="utf-8")
@@ -72,33 +75,37 @@ for i in range(0, 100):
     doc.segment(segmenter)
     doc.tag_morph(morph_tagger)
 
-    for t in doc.tokens:
-        if useful_tags.__contains__(t.pos):
-            final_words_tokens.append(t)
-
-for token in final_words_tokens:
-    token.lemmatize(morph_vocab)
+    for token in doc.tokens:
+        if token.pos in useful_tags:
+            token.lemmatize(morph_vocab)
+            lemma = token.lemma.lower()
+            if lemma not in all_lemmas:
+                all_lemmas[lemma] = set()
+                all_lemmas_indexes[lemma] = set()
+            all_lemmas[lemma].add(token.text.lower())
+            all_lemmas_indexes[lemma].add(i)
 
 # https://melaniewalsh.github.io/Intro-Cultural-Analytics/05-Text-Analysis/13-POS-Keywords.html
 
+# task 3 starts from part of 2 task
+lem_f = open(lemmas_tokens_file, 'w', encoding="utf-8")
+tot_f = open(all_tokens_file, 'w', encoding="utf-8")
+ind_f = open(inverted_indexes_file, 'w', encoding="utf-8")
 
-all_lemmas = {}
+for key in all_lemmas.keys():
+    lem_f.write(key + ":")
+    for s_el in all_lemmas[key]:
+        lem_f.write(" " + s_el)
+        tot_f.write(s_el + "\n")
+    lem_f.write("\n")
 
-for token in final_words_tokens:
-    lemma = token.lemma.lower()
-    if lemma not in all_lemmas:
-        all_lemmas[lemma] = set()
-    all_lemmas[lemma].add(token.text.lower())
+    ind_f.write(key + ":")
+    for i_el in all_lemmas_indexes[key]:
+        ind_f.write(" " + str(i_el))
+    ind_f.write("\n")
 
-with open(lemmas_tokens_file, 'w', encoding="utf-8") as lem_f:
-    with open(all_tokens_file, 'w', encoding="utf-8") as tot_f:
-        for key in all_lemmas.keys():
-            lem_f.write(key + ":")
-            for s_el in all_lemmas[key]:
-                lem_f.write(" " + s_el)
-                tot_f.write(s_el + "\n")
-            lem_f.write("\n")
+lem_f.close()
+tot_f.close()
+ind_f.close()
 
 ''' task 3 '''
-
-#
