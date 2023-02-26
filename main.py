@@ -79,7 +79,7 @@ for i in range(0, 100):
 for token in final_words_tokens:
     token.lemmatize(morph_vocab)
 
-#
+# https://melaniewalsh.github.io/Intro-Cultural-Analytics/05-Text-Analysis/13-POS-Keywords.html
 
 
 all_lemmas = {}
@@ -93,10 +93,12 @@ for token in final_words_tokens:
 with open(lemmas_tokens_file, 'w', encoding="utf-8") as lem_f:
     with open(all_tokens_file, 'w', encoding="utf-8") as tot_f:
         for key in all_lemmas.keys():
-            lem_f.write(key)
+            lem_f.write(key + ":")
             for s_el in all_lemmas[key]:
                 lem_f.write(" " + s_el)
-                tot_f.write(s_el + " ")
+                tot_f.write(s_el + "\n")
             lem_f.write("\n")
 
-# https://melaniewalsh.github.io/Intro-Cultural-Analytics/05-Text-Analysis/13-POS-Keywords.html
+''' task 3 '''
+
+#
