@@ -99,7 +99,7 @@ for key in all_lemmas.keys():
         tot_f.write(s_el + "\n")
     lem_f.write("\n")
 
-    ind_f.write(key + ":")
+    ind_f.write(key)
     for i_el in all_lemmas_indexes[key]:
         ind_f.write(" " + str(i_el))
     ind_f.write("\n")
@@ -108,4 +108,3 @@ lem_f.close()
 tot_f.close()
 ind_f.close()
 
-''' task 3 '''
