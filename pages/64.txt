@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ru" data-vue-meta="%7B%22lang%22:%7B%22ssr%22:%22ru%22%7D%7D">
+<head >
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,maximum-scale=1,user-scalable=0">
+  <meta name="referrer" content="unsafe-url">
+  <title>Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond» / Хабр</title>
+  <style>
+    /* cyrillic-ext */
+    @font-face {
+      font-family: 'Fira Sans';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnZKveSxf6TF0.woff2) format('woff2');
+      unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+    }
+
+    /* cyrillic */
+    @font-face {
+      font-family: 'Fira Sans';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnZKveQhf6TF0.woff2) format('woff2');
+      unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    }
+
+    /* latin-ext */
+    @font-face {
+      font-family: 'Fira Sans';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnZKveSBf6TF0.woff2) format('woff2');
+      unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+
+    /* latin */
+    @font-face {
+      font-family: 'Fira Sans';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnZKveRhf6.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    /* non-breaking hyphen */
+    @font-face {
+      font-family: 'Fira Sans';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/l/font?kit=KFOlCnqEu92Fr1MmEU9vBh0_IsHAlmrO6g&skey=ee881451c540fdec&v=v29) format('woff2');
+      unicode-range: U+02011;
+    }
+  </style>
+  <link rel="preload" href="https://assets.habr.com/habr-web/css/chunk-vendors.b6238726.css" as="style"><link rel="preload" href="https://assets.habr.com/habr-web/js/chunk-vendors.2287bfbd.js" as="script"><link rel="preload" href="https://assets.habr.com/habr-web/css/app.8d73f026.css" as="style"><link rel="preload" href="https://assets.habr.com/habr-web/js/app.58744b80.js" as="script"><link rel="preload" href="https://assets.habr.com/habr-web/js/7298.c8f1d73c.js" as="script">
+  <link rel="stylesheet" href="https://assets.habr.com/habr-web/css/chunk-vendors.b6238726.css"><link rel="stylesheet" href="https://assets.habr.com/habr-web/css/app.8d73f026.css">
+  <script>window.i18nFetch = new Promise((res, rej) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', '/js/i18n/ru-compiled.99fdff73029c662d76a25e7927355795.json');
+          xhr.responseType = 'json';
+          xhr.onload = function(e) {
+            if (this.status === 200) {
+              res({ru: xhr.response});
+            } else {
+              rej(e);
+            }
+          };
+          xhr.send();
+        });</script>
+  
+  <script data-vue-meta="ssr" type="application/ld+json" data-vmid="ldjson-schema">{"@context":"http:\/\/schema.org","@type":"Article","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/habr.com\/ru\/post\/709642\/"},"headline":"Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond»","datePublished":"2023-01-09T14:27:48+03:00","dateModified":"2023-01-10T04:01:48+03:00","author":{"@type":"Person","name":"Davidoff Mikhail"},"publisher":{"@type":"Organization","name":"Habr","logo":{"@type":"ImageObject","url":"https:\/\/habrastorage.org\/webt\/a_\/lk\/9m\/a_lk9mjkccjox-zccjrpfolmkmq.png"}},"description":"ВведениеСсылка на видео-туториал и подробное объяснениеGitHubВ этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Face...","url":"https:\/\/habr.com\/ru\/post\/709642\/#post-content-body","about":["h_p2p","h_programming","h_solidity","h_distributed_systems","h_cryptocurrency","f_develop","f_admin","f_popsci"],"image":["https:\/\/habr.com\/share\/publication\/709642\/ab694783ad133c9e33671e4c0ec05226\/","https:\/\/habrastorage.org\/getpro\/habr\/upload_files\/49c\/e9c\/a37\/49ce9ca37f92e4074f49cf8818c3298e.png","https:\/\/habrastorage.org\/getpro\/habr\/upload_files\/edf\/ff5\/b61\/edfff5b614d6d26fca15964d1737ae10.png","https:\/\/habrastorage.org\/getpro\/habr\/upload_files\/38c\/cba\/803\/38ccba803d743f3a4ef96f5c3d841d52.jpg"]}</script>
+  <script src="//www.googletagservices.com/tag/js/gpt.js" async></script>
+  <style>.grecaptcha-badge{visibility: hidden;}</style>
+  <meta name="habr-version" content="2.113.0">
+  
+  <meta data-vue-meta="ssr" property="fb:app_id" content="444736788986613"><meta data-vue-meta="ssr" property="fb:pages" content="472597926099084"><meta data-vue-meta="ssr" name="twitter:card" content="summary_large_image"><meta data-vue-meta="ssr" name="twitter:site" content="@habr_com"><meta data-vue-meta="ssr" property="og:site_name" content="Хабр" data-vmid="og:site_name"><meta data-vue-meta="ssr" property="og:title" content="Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond»" data-vmid="og:title"><meta data-vue-meta="ssr" name="twitter:title" content="Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond»" data-vmid="twitter:title"><meta data-vue-meta="ssr" name="aiturec:title" content="Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond»" data-vmid="aiturec:title"><meta data-vue-meta="ssr" name="description" content="Введение Ссылка на видео-туториал и подробное объяснение GitHub В этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность..." data-vmid="description"><meta data-vue-meta="ssr" itemprop="description" content="Введение Ссылка на видео-туториал и подробное объяснение GitHub В этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность..." data-vmid="description:itemprop"><meta data-vue-meta="ssr" property="og:description" content="Введение Ссылка на видео-туториал и подробное объяснение GitHub В этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность..." data-vmid="og:description"><meta data-vue-meta="ssr" name="twitter:description" content="Введение Ссылка на видео-туториал и подробное объяснение GitHub В этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность..." data-vmid="twitter:description"><meta data-vue-meta="ssr" property="aiturec:description" content="Введение Ссылка на видео-туториал и подробное объяснение GitHub В этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность..." data-vmid="aiturec:description"><meta data-vue-meta="ssr" itemprop="image" content="https://habrastorage.org/getpro/habr/upload_files/e07/53a/0d6/e0753a0d65dfa0cc4daf77a960d359d3.png" data-vmid="image:itemprop"><meta data-vue-meta="ssr" property="og:image" content="https://habrastorage.org/getpro/habr/upload_files/e07/53a/0d6/e0753a0d65dfa0cc4daf77a960d359d3.png" data-vmid="og:image"><meta data-vue-meta="ssr" property="og:image:width" content="1200" data-vmid="og:image:width"><meta data-vue-meta="ssr" property="og:image:height" content="630" data-vmid="og:image:height"><meta data-vue-meta="ssr" property="aiturec:image" content="https://habrastorage.org/getpro/habr/upload_files/e07/53a/0d6/e0753a0d65dfa0cc4daf77a960d359d3.png" data-vmid="aiturec:image"><meta data-vue-meta="ssr" name="twitter:image" content="https://habrastorage.org/getpro/habr/upload_files/e07/53a/0d6/e0753a0d65dfa0cc4daf77a960d359d3.png" data-vmid="twitter:image"><meta data-vue-meta="ssr" property="vk:image" content="https://habrastorage.org/getpro/habr/upload_files/e07/53a/0d6/e0753a0d65dfa0cc4daf77a960d359d3.png?format=vk" data-vmid="vk:image"><meta data-vue-meta="ssr" property="aiturec:item_id" content="709642" data-vmid="aiturec:item_id"><meta data-vue-meta="ssr" property="aiturec:datetime" content="2023-01-09T11:27:48.000Z" data-vmid="aiturec:datetime"><meta data-vue-meta="ssr" content="https://habr.com/ru/post/709642/" property="og:url" data-vmid="og:url"><meta data-vue-meta="ssr" property="og:type" content="article" data-vmid="og:type"><meta data-vue-meta="ssr" property="og:locale" content="ru_RU" data-vmid="og:locale"><meta data-vue-meta="ssr" name="keywords" content="Diamond, прокси, мултипрокси, eip2535, Solidity, модульный смарт контракт, обновляемый контракт">
+  <link data-vue-meta="ssr" href="https://habr.com/ru/rss/post/709642/?fl=ru" type="application/rss+xml" title="" rel="alternate" name="rss"><link data-vue-meta="ssr" href="https://habr.com/ru/post/709642/" rel="canonical" data-vmid="canonical"><link data-vue-meta="ssr" rel="image_src" href="https://habrastorage.org/getpro/habr/upload_files/e07/53a/0d6/e0753a0d65dfa0cc4daf77a960d359d3.png" data-vmid="image:href"><link data-vue-meta="ssr" rel="amphtml" href="https://habr.com/ru/amp/post/709642/">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#303b44">
+  <meta name="msapplication-TileColor" content="#629FBC">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link
+    rel="shortcut icon"
+    type="image/png"
+    sizes="16x16"
+    href="https://assets.habr.com/habr-web/img/favicons/favicon-16.png"
+  >
+  <link
+    rel="shortcut icon"
+    type="image/png"
+    sizes="32x32"
+    href="https://assets.habr.com/habr-web/img/favicons/favicon-32.png"
+  >
+  <link
+    rel="apple-touch-icon"
+    type="image/png"
+    sizes="76x76"
+    href="https://assets.habr.com/habr-web/img/favicons/apple-touch-icon-76.png"
+  >
+  <link
+    rel="apple-touch-icon"
+    type="image/png"
+    sizes="120x120"
+    href="https://assets.habr.com/habr-web/img/favicons/apple-touch-icon-120.png"
+  >
+  <link
+    rel="apple-touch-icon"
+    type="image/png"
+    sizes="152x152"
+    href="https://assets.habr.com/habr-web/img/favicons/apple-touch-icon-152.png"
+  >
+  <link
+    rel="apple-touch-icon"
+    type="image/png"
+    sizes="180x180"
+    href="https://assets.habr.com/habr-web/img/favicons/apple-touch-icon-180.png"
+  >
+  <link
+    rel="apple-touch-icon"
+    type="image/png"
+    sizes="256x256"
+    href="https://assets.habr.com/habr-web/img/favicons/apple-touch-icon-256.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1136x640.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2436x1125.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1792x828.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_828x1792.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1334x750.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1242x2668.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2208x1242.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1125x2436.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1242x2208.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2732x2048.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2688x1242.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2224x1668.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_750x1334.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2048x2732.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2388x1668.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1668x2224.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_640x1136.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1668x2388.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_2048x1536.png"
+  >
+  <link
+    rel="apple-touch-startup-image"
+    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="https://assets.habr.com/habr-web/img/splashes/splash_1536x2048.png"
+  >
+  <link
+    rel="mask-icon"
+    color="#77a2b6"
+    href="https://assets.habr.com/habr-web/img/favicons/apple-touch-icon-120.svg"
+  >
+  <link
+    crossorigin="use-credentials"
+    href="/manifest.webmanifest"
+    rel="manifest"
+  >
+  <script async src="https://unpkg.com/pwacompat" crossorigin="anonymous"></script>
+  <script>window.yaContextCb = window.yaContextCb || []</script>
+  <script src="https://yandex.ru/ads/system/context.js" async></script>
+</head>
+<body>
+
+
+<div id="app" data-server-rendered="true" data-async-called="true"><div class="tm-layout__wrapper"><!----> <div></div> <!----> <header class="tm-header"><div class="tm-page-width"><div class="tm-header__container"><!----> <span class="tm-header__logo-wrap"><a href="/ru/" class="tm-header__logo tm-header__logo_ru"><svg height="16" width="16" class="tm-svg-img tm-header__icon"><title>Хабр</title> <use xlink:href="/img/habr-logo-ru.svg#logo"></use></svg></a> <span class="tm-header__beta-sign" style="display:none;">β</span></span> <div class="tm-dropdown tm-header__projects"><div class="tm-dropdown__head"><button class="tm-header__dropdown-toggle"><svg height="16" width="16" class="tm-svg-img tm-header__icon tm-header__icon_dropdown"><title>Открыть список</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#arrow-down"></use></svg></button></div> <!----></div> <a href="/ru/sandbox/start/" class="tm-header__become-author-btn">
+            Как стать автором
+          </a> <div class="tm-feature tm-header__feature tm-feature tm-feature_variant-inline"><!----></div> <!----> <!----></div></div></header> <div class="tm-layout"><div class="tm-page-progress-bar"></div> <div data-menu-sticky="true" class="tm-base-layout__header tm-base-layout__header_is-sticky"><div class="tm-page-width"><div class="tm-base-layout__header-wrapper"><div class="tm-main-menu"><div class="tm-main-menu__section"><nav class="tm-main-menu__section-content"><!----> <a href="/ru/all/" class="tm-main-menu__item">
+        Все потоки
+      </a> <a href="/ru/flows/develop/" class="tm-main-menu__item">
+          Разработка
+        </a><a href="/ru/flows/admin/" class="tm-main-menu__item">
+          Администрирование
+        </a><a href="/ru/flows/design/" class="tm-main-menu__item">
+          Дизайн
+        </a><a href="/ru/flows/management/" class="tm-main-menu__item">
+          Менеджмент
+        </a><a href="/ru/flows/marketing/" class="tm-main-menu__item">
+          Маркетинг
+        </a><a href="/ru/flows/popsci/" class="tm-main-menu__item">
+          Научпоп
+        </a></nav></div></div> <div class="tm-header-user-menu tm-base-layout__user-menu"><a href="/ru/search/" class="tm-header-user-menu__item tm-header-user-menu__search"><svg height="24" width="24" class="tm-svg-img tm-header-user-menu__icon tm-header-user-menu__icon_search tm-header-user-menu__icon_dark"><title>Поиск</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#search"></use></svg></a> <!----> <!----> <!----> <div class="tm-header-user-menu__item tm-header-user-menu__user_desktop"><div class="tm-dropdown"><div class="tm-dropdown__head"><svg height="24" width="24" data-test-id="menu-toggle-guest" class="tm-svg-img tm-header-user-menu__icon tm-header-user-menu__icon_dark"><title>Профиль</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#header-user"></use></svg> <!----></div> <!----></div> <!----></div> <!----></div></div></div></div> <!----> <div class="tm-page-width"></div> <main class="tm-layout__container"><div hl="ru" data-async-called="true" class="tm-page"><div class="tm-page-width"><!----> <div class="tm-page__wrapper"><div class="tm-page__main tm-page__main_has-sidebar"><div class="pull-down"><!----> <div class="pull-down__header" style="height:0px;"><div class="pull-down__content" style="bottom:10px;"><svg height="24" width="24" class="tm-svg-img pull-down__arrow"><title>Обновить</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#pull-arrow"></use></svg></div></div> <div class="tm-article-presenter"> <div class="tm-article-presenter__body"><div class="tm-misprint-area"><div class="tm-misprint-area__wrapper"><article class="tm-article-presenter__content tm-article-presenter__content_narrow"><div class="tm-article-presenter__header"> <div class="tm-article-snippet tm-article-presenter__snippet tm-article-snippet"><div class="tm-article-snippet__meta-container"><div class="tm-article-snippet__meta"><span class="tm-user-info tm-article-snippet__author"><a href="/ru/users/justDeveloper23/" title="justDeveloper23" class="tm-user-info__userpic"><div class="tm-entity-image"><svg height="24" width="24" class="tm-svg-img tm-image-placeholder tm-image-placeholder_pink"><!----> <use xlink:href="/img/megazord-v28.2b11c25e..svg#placeholder-user"></use></svg></div></a> <span class="tm-user-info__user"><a href="/ru/users/justDeveloper23/" class="tm-user-info__username">
+      justDeveloper23
+      <!----></a> <span class="tm-article-datetime-published"><time datetime="2023-01-09T11:27:48.000Z" title="2023-01-09, 14:27">9  янв   в 14:27</time></span></span></span></div> <!----></div> <h1 lang="ru" class="tm-article-snippet__title tm-article-snippet__title_h1"><span>Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond»</span></h1> <div class="tm-article-snippet__stats"><!----> <div class="tm-article-reading-time"><span class="tm-svg-icon__wrapper tm-article-reading-time__icon"><svg height="24" width="24" class="tm-svg-img tm-svg-icon"><title>Время на прочтение</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#clock"></use></svg></span> <span class="tm-article-reading-time__label">
+    28 мин
+  </span></div> <span class="tm-icon-counter tm-data-icons__item"><svg height="24" width="24" class="tm-svg-img tm-icon-counter__icon"><title>Количество просмотров</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#counter-views"></use></svg> <span class="tm-icon-counter__value">938</span></span></div> <div class="tm-article-snippet__hubs-container"><div class="tm-article-snippet__hubs"><span class="tm-article-snippet__hubs-item"><a href="/ru/hub/p2p/" class="tm-article-snippet__hubs-item-link"><span>Децентрализованные сети</span> <span title="Профильный хаб" class="tm-article-snippet__profiled-hub">*</span></a></span><span class="tm-article-snippet__hubs-item"><a href="/ru/hub/programming/" class="tm-article-snippet__hubs-item-link"><span>Программирование</span> <span title="Профильный хаб" class="tm-article-snippet__profiled-hub">*</span></a></span><span class="tm-article-snippet__hubs-item"><a href="/ru/hub/solidity/" class="tm-article-snippet__hubs-item-link"><span>Solidity</span> <span title="Профильный хаб" class="tm-article-snippet__profiled-hub">*</span></a></span><span class="tm-article-snippet__hubs-item"><a href="/ru/hub/distributed_systems/" class="tm-article-snippet__hubs-item-link"><span>Распределённые системы</span> <span title="Профильный хаб" class="tm-article-snippet__profiled-hub">*</span></a></span><span class="tm-article-snippet__hubs-item"><a href="/ru/hub/cryptocurrency/" class="tm-article-snippet__hubs-item-link"><span>Криптовалюты</span> <!----></a></span></div></div> <!----> <!----> <!----></div></div> <!----> <div data-gallery-root="" lang="ru" class="tm-article-body"><div></div> <div id="post-content-body"><div><div class="article-formatted-body article-formatted-body article-formatted-body_version-2"><div xmlns="http://www.w3.org/1999/xhtml"><h2>Введение</h2><p><a href="https://www.youtube.com/watch?v=42TUqDW74v8" rel="noopener noreferrer nofollow">Ссылка на видео-туториал и подробное объяснение</a></p><p><a href="https://github.com/davydovMikhail/multi-proxy-contract" rel="noopener noreferrer nofollow">GitHub</a></p><p>В этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность создавать модульные, обновляемые смарт контракты, которые обладают рядом преимуществ перед такими стандартами обновляемых контрактов как Transparent и UUPS.  </p><p>Рассмотрим причины, по которым вы можете использовать стандарт Diamond для своего проекта:  </p><ol><li><p>Diamond имеет единый адрес proxy который используется как точка входа для обращения ко всем имплементациям, такой подход упрощает развертывание, тестирование и интеграцию с другими смарт контрактами.</p></li><li><p>Diamond не имеет ограничений по размеру контракта, то есть суммарный размер всех ваших имплементаций может выходить далеко за 24 килобайта.</p></li><li><p>Стандарт позволяет реализовать гибкую систему взаимодействия между гранями(facets), стораджами и библиотеками.</p></li><li><p>С течением времени и по мере необходимости функциональность контракта может быть добавлена, заменена или вовсе удалена. Также по причине описанной в п. 2 контракт не имеет ограничений по количестве функций, которые в нем используются.</p></li><li><p>Контракт Diamond может быть неизменяемым, либо сразу, либо по прошевствию какого-то времени, когда будет принято решение сделать Diamond неизменяемым.</p></li><li><p>Diamond может использовать уже развернутые имплементации, что может положительно сказаться на тратах на газ. Такой подход делает этот стандарт открытым для всех участников сети.</p></li><li><p>Имплементации или грани(facets) независимы друг от друга, но могут совместно использовать внутренние функции, библиотеки и переменные состояния.</p></li><li><p>Добавление/замена/удаление сразу нескольких функций может осуществляться в одной транзакции.</p></li><li><p>Для изменения имплементаций можно использовать DAO и прочих инициализаторов обновления контракта.</p></li></ol><h2>Теория</h2><p>Diamond вызывает функции своих граней(facet), используя delegatecall, если кому-то нужно вспомнить или узнать как работает delegatecall, милости прошу: <a href="https://solidity-by-example.org/delegatecall/" rel="noopener noreferrer nofollow">solidity-by-example/delegatecall</a>.</p><p>Когда к Diamond обращается какой-то адрес и вызывает функцию из имплементации, срабатывает fallback. Как работает функция fallback: <a href="https://solidity-by-example.org/fallback/" rel="noopener noreferrer nofollow">solidity-by-example/fallback</a>.</p><p>Внутри функции fallback определяется на какой адрес нужно делегировать вызов на основе первых четырех байтов из msg.data, или же эти 4 байта можно получить сразу обратившись к глобальной переменной msg.sig, таким образом мы получим селектор функции. Подробнее о том что такое селектор функции и как его можно получить: <a href="https://solidity-by-example.org/function-selector/" rel="noopener noreferrer nofollow">solidity-by-example/function-selector</a>.</p><p>Благодаря свойствам fallback и delegatecall, Diamond может выполнять функцию грани(facet), как если бы она была определена в самом Diamond. При вызове функции из имплементации(читай грани) благодаря delegatecall значения msg.sender и msg.value остаются неизменными, а также считывается и записывается только хранилище diamond, то есть, можно сказать, что грань(facet), к которой мы обращаемся дает только инструкцию, в которой сказано как обращаться с хранилищем diamond.</p><p>Рассмотрим концептуальную реализацию функции fallback() в основном контракте diamond:</p><pre><code>fallback() external payable {
+  // получаем адрес грани, на которую будет делегирован вызов
+  address facet = selectorTofacet[msg.sig];
+	// убеждаемся в том, что такая грань была добавлена в mapping selectorTofacet
+  require(facet != address(0));
+	// выполяняем вызов external функции из грани через delegatecall и возвращаем
+	// какое-то значение
+  assembly {
+    // копируем селектор функции и аргументы
+    calldatacopy(0, 0, calldatasize())
+		// вызываем функцию из грани, указывая адрес этой грани    
+    let result := delegatecall(gas(), facet, 0, calldatasize(), 0, 0)
+    // получаем какое-то возвращаемое значение
+    returndatacopy(0, 0, returndatasize())
+    // возвращаем либо ошибку либо ответ в зависимости от значения result
+    switch result
+      case 0 {revert(0, returndatasize())}
+      default {return (0, returndatasize())}
+  }
+}</code></pre><p>Подведем итоги по строению Diamond:  </p><ol><li><p>В контракте есть только одна функция fallback.</p></li><li><p>В зависимости от селектора вызов делегируется на нужную имплементацию.</p></li><li><p>Каждому селектору соответствует свой адрес грани.</p></li><li><p>Все состояния хранятся на контракте Diamond, на гранях(facets) только логика.</p></li></ol><figure class="bordered full-width "><img src="https://habrastorage.org/r/w1560/getpro/habr/upload_files/49c/e9c/a37/49ce9ca37f92e4074f49cf8818c3298e.png" alt="Строение Diamond" title="Строение Diamond" width="554" height="725" data-src="https://habrastorage.org/getpro/habr/upload_files/49c/e9c/a37/49ce9ca37f92e4074f49cf8818c3298e.png"/><figcaption>Строение Diamond</figcaption></figure><h2>Организация хранилища  </h2><p>Для облуживания стораджа контракта Diamond используются библиотеки. Количество стораджей неограниченно, они могут появляться по мере необходимости и появления нового функционала и переменных. Чтобы значения в сторадже не перепутались и не перезаписывались хаотичным образом, каждый сторадж организуется в структуру, в свою очередь структура, помещается в определенную ячейку, которая является точкой входа, для обращения к конкретной переменной структуры.</p><p>Рассмотрим следующий пример: мы имеем две грани, которые обращаются к одному и тому же стораджу используя библиотеку. Эти грани будут представлять из себя частичную реализацию стандарта ERC-721.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// библиотека для обслуживания стораджа
+library LibERC721 {
+		// получаем идентификатор стораджа
+    bytes32 constant ERC721_POSITION = keccak256("erc721.storage");
+ 
+		// перечисляем в структуре стораджа состояния, к которым будем обращаться 
+    struct ERC721Storage {
+        // tokenId => owner
+        mapping (uint256 => address) tokenIdToOwner;
+        // owner => count of tokens owned
+        mapping (address => uint256) ownerToNFTokenCount;
+        string name;
+        string symbol;   
+    }
+
+		// функция, возвращающая структуру стораджа из слота ERC721_POSITION
+    function getStorage() internal pure returns (ERC721Storage storage storageStruct) {
+        bytes32 position = ERC721_POSITION;
+        assembly {
+            storageStruct.slot := position
+        }
+    }
+    event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
+
+		// все функции, которые есть в библиотеке должны быть internal
+    function transferFrom(address _from, address _to, uint256 _tokenId) internal {
+				// обращаемся к getStorage, чтобы получить структуру стораджа
+				// указываем ключевое слово storage, это говорит компилятору о том,
+				// что мы читаем и вносим изменения именно в хранилище контракта,
+				// а не в memory или calldata
+        ERC721Storage storage erc721Storage = LibERC721.getStorage();
+				// изменяем переменные так как нам нужно
+        address tokenOwner = erc721Storage.tokenIdToOwner[_tokenId];
+        require(tokenOwner == _from);
+        erc721Storage.tokenIdToOwner[_tokenId] = _to;
+        erc721Storage.ownerToNFTokenCount[_from]--;
+        erc721Storage.ownerToNFTokenCount[_to]++;
+        emit Transfer(_from, _to, _tokenId);
+    }
+}
+// грань, которая реализует три метода, при этом во всех методах, получение 
+// и запись значений происходит из библиотеки, в свою очередь библиотека изменяет 
+// хранилище diamond, используя ERC721_POSITION как точку входа для обращения к стораджу,
+// а struct ERC721Storage как темплейт, который показывает как правильно обратиться
+// к той или иной переменной внутри контракта Diamond
+contract ERC721Facet {
+    function name() external view returns (string memory name_) {
+        name_ = LibERC721.getStorage().name;
+    }
+    
+    function symbol() external view returns (string memory symbol_) {
+        symbol_ = LibERC721.getStorage().symbol;
+    }
+
+    function transferFrom(address _from, address _to, uint256 _tokenId) external {
+        LibERC721.transferFrom(_from, _to, _tokenId);
+    }
+}
+// ещё одна грань, которая использует библиотеку
+contract ERC721BatchTransferFacet {
+    function batchTransferFrom(address _from, address _to, uint256[] calldata _tokenIds) external {
+        for(uint256 i; i &lt; _tokenIds.length; i++) {
+          LibERC721.transferFrom(_from, _to, _tokenIds[i]);
+        }
+    }
+}</code></pre><p>Как правильно обновлять сторадж:</p><ol><li><p>Чтобы добавить новые переменные состояния в структуру хранилища, добавьте их в самый конец структуры.</p></li><li><p>Если вам нужно добавить mapping, помещайте его также в конец структуры.</p></li><li><p>Имена переменных состояния могут быть изменены, но это может привести к путанице, если разные грани используют разные имена для одних и тех же мест хранения. Поэтому для всех граней рекомендуется использовать библиотеки где сторадж определен одинаково, как с точки зрения нейминга, так и с точки зрения порядка следования переменных в структуре.</p></li></ol><p>Что не следует делать при изменении стораджа:</p><ol><li><p>Не добавляйте новые переменные состояния в начало или середину структур. Выполнение этого приводит к тому, что новая переменная состояния перезаписывает существующие данные переменной состояния и все переменные состояния после неё, так как новая переменная состояния ссылается на неправильное место хранения.</p></li><li><p>Допустим у вас в структуре стораджа есть mapping, который возвращает другую структуру, такая практика допустима, если возвращаемая структура не будет обновляться на протяжении всего времени существования Diamond. Если же в будущем появится потребность изменить возвращаемую мапингом структуру, то вам придется создавать новый мапинг для этой структуры.</p></li><li><p>Не добавляйте новые переменные состояния в структуры, которые используются в массивах.</p></li><li><p>При использовании хранилища Diamond не используйте один и тот же номер слота(ERC721_POSITION в примере) для разных хранилищ. Это очевидно. Два разных хранилища в одном и том же месте будут перезаписывать друг друга.</p></li><li><p>Не допускайте, чтобы какая-либо грань могла вызывать <code>selfdestruct</code>. Просто не разрешайте команде <code>selfdestruct</code> существовать в любом исходном коде грани и не разрешайте вызывать эту команду через вызов delegatecall. Потому что <code>selfdestruct</code> может удалить грань, которая используется алмазом, или <code>selfdestruct</code> может быть использован для удаления основного прокси-контракта Diamond.</p></li></ol><p>Грани могут совместно использовать одни и те же стораджи. Грани могут использовать одни и те же внутренние функции и библиотеки. Таким образом, грани являются независимыми друг от друга единицами, но при этом они могут обращаться к одинаковым библиотекам для изменения состояния хранилища.  </p><figure class="full-width "><img src="https://habrastorage.org/r/w1560/getpro/habr/upload_files/edf/ff5/b61/edfff5b614d6d26fca15964d1737ae10.png" alt="Пример организации архитектуры хранилища и логики граней" title="Пример организации архитектуры хранилища и логики граней" width="640" height="360" data-src="https://habrastorage.org/getpro/habr/upload_files/edf/ff5/b61/edfff5b614d6d26fca15964d1737ae10.png"/><figcaption>Пример организации архитектуры хранилища и логики граней</figcaption></figure><p>На диаграмме выше:</p><ul><li><p>Только FacetA может получить доступ к DataA</p></li><li><p>Только FacetB может получить доступ к DataB</p></li><li><p>Только код Diamond может получить доступ к DataD</p></li><li><p>Доступ к DataAB имеют как FacetA так и FacetB</p></li><li><p>К DataABD можно обратиться откуда угодно</p></li></ul><h2>Добавление/замена/удаление функций  </h2><p>Любой Diamond должен реализовывать интерфейс IDiamond.  </p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+interface IDiamond {
+		// действие, которое нам необходимо произвести по отношение к грани и ее функциям
+    enum FacetCutAction {Add, Replace, Remove}
+    // Add=0, Replace=1, Remove=2 (добавить, заменить, удалить)
+
+		// структура, в которой описаны действия для редактирования грани
+    struct FacetCut {
+        address facetAddress; // адрес грани
+        FacetCutAction action; // производимое действие
+        bytes4[] functionSelectors; // массив с селекторами функций
+    }
+
+		// событие, которое вызывается каждый раз, 
+		// когда грани добавляются, заменяются, удаляются
+    event DiamondCut(FacetCut[] _diamondCut, address _init, bytes _calldata);
+}</code></pre><p>В свою очередь интерфейс IDiamond наследуется другим интерфейсом IDiamondCut, который содержит в себе одну функцию diamondCut.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { IDiamond } from "./IDiamond.sol";
+
+interface IDiamondCut is IDiamond {    
+		// _diamondCut - содержит адрес грани, селекторы и действие
+		// _init - адрес контракта на который будет вызвана _calldata
+		// в конце функции diamondCut
+    function diamondCut(
+        FacetCut[] calldata _diamondCut,
+        address _init,
+        bytes calldata _calldata
+    ) external;    
+}</code></pre><p>Функция diamondCut обновляет любое количество функций из любого количества фасетов за одну транзакцию. Выполнение всех изменений в рамках одной транзакции предотвращает повреждение данных, которое может произойти при обновлениях, выполняемых в рамках нескольких транзакций.</p><p>После добавления/замены/удаления функций аргумент _calldata выполняется на адрес _init через delegatecall. Это выполнение выполняется для инициализации данных или настройки или удаления чего-либо необходимого или больше не нужного после добавления, замены и/или удаления функций. Можно провести аналогию с функцие конструктором, которая также инициализирует какие-то начальные значения.</p><p>Если значение _init равно нулевому адресу address(0) то выполнение _calldata пропускается. В этом случае _calldata может содержать 0 байт или пользовательскую информацию, которая отправится на etherscan через событие DiamondCut.</p><h2>Проверка граней и функций</h2><p>Diamond должен поддерживать проверку аспектов и функций путем реализации интерфейса IDiamondLoupe.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+interface IDiamondLoupe {
+    // структура содержащая информацию о грани
+    struct Facet {
+        address facetAddress; // адрес грани
+        bytes4[] functionSelectors; // массив со всеми добавленными селекторами
+    }
+
+    // получение полной информации по всем граням, на которые может делегировать Diamond
+    function facets() external view returns (Facet[] memory facets_);
+
+    // получение селекторов всех функций грани, на которые делегирует Diamond
+    function facetFunctionSelectors(address _facet) external view returns (bytes4[] memory facetFunctionSelectors_);
+
+    // получение адресов всех граней
+    function facetAddresses() external view returns (address[] memory facetAddresses_);
+
+    // получение адреса грани по селектору, функция которого находится на этой грани
+    function facetAddress(bytes4 _functionSelector) external view returns (address facetAddress_);
+}</code></pre><p>Таким образом с помощью интерфейса IDiamondCut мы обновляем Diamond, а с помощью IDiamondLoupe можем отслеживать грани и их состояние на наличие тех или иных селекторов.</p><h2>Практика</h2><p>Напишем обычный erc20 весь функционал которого будет разбит на 4 грани. Это будет сделано для наглядности, ведь внутренний механизм работы стандарта erc20 известен всем или многим.</p><p>Но перед этим нам нужно разобраться с обслуживающими гранями, которые отвечают за изменение функциональности и мониторинг уже имеющихся граней и функциональности.</p><p>Эти целям будет служить библиотека LibDiamond и три грани: DiamondCutFacet - для изменения функциональности, DiamondLoupeFacet - для мониторинга граней и функциональности контракта Diamond, OwnershipFacet - грань, которая помогает администрировать доступ к функции diamindCut, чтобы имплементации не менялись кем попало.</p><p>Рассмотрим код библиотеки LibDiamond, она будет дана в сокращенном виде, полный код будет в открытом доступе на github:</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { IDiamond } from "../interfaces/IDiamond.sol";
+import { IDiamondCut } from "../interfaces/IDiamondCut.sol";
+
+library LibDiamond {
+		// номер слота, который является точкой входа для обращения DiamondStorage
+    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256("diamond.standard.diamond.storage");
+
+    struct FacetAddressAndSelectorPosition {
+        address facetAddress; // адрес грани
+        uint16 selectorPosition; // индекс селектора в массиве bytes4[] selectors
+    }
+
+    struct DiamondStorage {
+        // соответсвие селектор => информация по нему
+        mapping(bytes4 => FacetAddressAndSelectorPosition) facetAddressAndSelectorPosition;
+				// массив со всеми селекторами
+        bytes4[] selectors;
+        // владелец Diamond, который может вызывать diamondCut
+        address contractOwner;
+    }
+
+		// функция для обращения к хранилищу
+    function diamondStorage() internal pure returns (DiamondStorage storage ds) {
+        bytes32 position = DIAMOND_STORAGE_POSITION;
+        assembly {
+            ds.slot := position
+        }
+    }
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+		// установить нового владельца
+    function setContractOwner(address _newOwner) internal {
+        DiamondStorage storage ds = diamondStorage();
+        address previousOwner = ds.contractOwner;
+        ds.contractOwner = _newOwner;
+        emit OwnershipTransferred(previousOwner, _newOwner);
+    }
+
+		// получить адрес владельца
+    function contractOwner() internal view returns (address contractOwner_) {
+        contractOwner_ = diamondStorage().contractOwner;
+    }
+
+		// проверка на то, что вызывающий является влдаельцем Diamond
+    function enforceIsContractOwner() internal view {
+        if(msg.sender != diamondStorage().contractOwner) {
+            revert NotContractOwner(msg.sender, diamondStorage().contractOwner);
+        }        
+    }
+
+    event DiamondCut(IDiamondCut.FacetCut[] _diamondCut, address _init, bytes _calldata);
+
+    // основная функция с помощью которой изменяется весь функционал Diamond
+    function diamondCut(
+        IDiamondCut.FacetCut[] memory _diamondCut,
+        address _init,
+        bytes memory _calldata
+    ) internal {
+        for (uint256 facetIndex; facetIndex &lt; _diamondCut.length; facetIndex++) {
+            bytes4[] memory functionSelectors = _diamondCut[facetIndex].functionSelectors;
+            address facetAddress = _diamondCut[facetIndex].facetAddress;
+            if(functionSelectors.length == 0) {
+                revert NoSelectorsProvidedForFacetForCut(facetAddress);
+            }
+            IDiamondCut.FacetCutAction action = _diamondCut[facetIndex].action;
+            if (action == IDiamond.FacetCutAction.Add) {
+                addFunctions(facetAddress, functionSelectors);
+            } else if (action == IDiamond.FacetCutAction.Replace) {
+                replaceFunctions(facetAddress, functionSelectors);
+            } else if (action == IDiamond.FacetCutAction.Remove) {
+                removeFunctions(facetAddress, functionSelectors);
+            } else {
+                revert IncorrectFacetCutAction(uint8(action));
+            }
+        }
+        emit DiamondCut(_diamondCut, _init, _calldata);
+        initializeDiamondCut(_init, _calldata);
+    }
+
+		// функции добавления/замены/удаления селекторов из граней
+    function addFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {        
+        
+    }
+    function replaceFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {        
+        
+    }
+    function removeFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {        
+              
+    }
+
+		// функция вызываемая каждый раз в конце diamondCut, для инициализации каких-то переменных
+    function initializeDiamondCut(address _init, bytes memory _calldata) internal {
+        if (_init == address(0)) {
+            return;
+        }
+        enforceHasContractCode(_init, "LibDiamondCut: _init address has no code");        
+        (bool success, bytes memory error) = _init.delegatecall(_calldata);
+        if (!success) {
+            if (error.length > 0) {
+                // bubble up error
+                /// @solidity memory-safe-assembly
+                assembly {
+                    let returndata_size := mload(error)
+                    revert(add(32, error), returndata_size)
+                }
+            } else {
+                revert InitializationFunctionReverted(_init, _calldata);
+            }
+        }        
+    }
+
+		// проверка на то, что адрес является контрактом, а не адресом
+    function enforceHasContractCode(address _contract, string memory _errorMessage) internal view {
+        uint256 contractSize;
+        assembly {
+            contractSize := extcodesize(_contract)
+        }
+        if(contractSize == 0) {
+            revert NoBytecodeAtAddress(_contract, _errorMessage);
+        }        
+    }
+}</code></pre><p>Рассмотрим грань DiamondCutFacet, отвечающая за изменение функционала Diamond:</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { IDiamondCut } from "../interfaces/IDiamondCut.sol";
+// импортируем библиотеку, чтобы обращаться к ней и менять состояния хранилища
+import { LibDiamond } from "../libraries/LibDiamond.sol";
+
+contract DiamondCutFacet is IDiamondCut {
+    
+    function diamondCut(
+        FacetCut[] calldata _diamondCut,
+        address _init,
+        bytes calldata _calldata
+    ) external override {
+				// проверяем, что отправитель являеися владельцем Diamind
+        LibDiamond.enforceIsContractOwner();
+				// непосредтвенно вызываем diamondCut из библиотеки
+        LibDiamond.diamondCut(_diamondCut, _init, _calldata);
+    }
+}</code></pre><p>Рассмотрим грань DiamondLoupeFacet, код будет показан в сокращенном виде, полный код можно посмотреть на github:</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { LibDiamond } from  "../libraries/LibDiamond.sol";
+import { IDiamondLoupe } from "../interfaces/IDiamondLoupe.sol";
+
+contract DiamondLoupeFacet is IDiamondLoupe {
+    
+		// получение полной информации по всем граням, на которые может делегировать Diamond
+    function facets() external override view returns (Facet[] memory facets_) {
+        // код функции
+    }
+
+		// получение селекторов всех функций грани, на которые делегирует Diamond
+    function facetFunctionSelectors(address _facet) external override view returns (bytes4[] memory _facetFunctionSelectors) {
+        // код функции
+    }
+
+		// получение адресов всех граней
+    function facetAddresses() external override view returns (address[] memory facetAddresses_) {
+        // код функции
+    }
+
+		// получение адреса грани по селектору, функция которого находится на этой грани
+    function facetAddress(bytes4 _functionSelector) external override view returns (address facetAddress_) {
+        // код функции
+    }
+}</code></pre><p>Последняя обязательная грань OwnershipFacet:  </p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { LibDiamond } from "../libraries/LibDiamond.sol";
+
+contract OwnershipFacet {
+		// передача права вледения на Diamond другому адресу
+    function transferOwnership(address _newOwner) external {
+				// проверка на то, что отправитель владелец Diamond
+        LibDiamond.enforceIsContractOwner();
+				// установка нового владельца
+        LibDiamond.setContractOwner(_newOwner);
+    }
+
+		// view функция, которая возвращает адрес владельца Diamond
+    function owner() external view returns (address owner_) {
+        owner_ = LibDiamond.contractOwner();
+    }
+}</code></pre><p>Наконец рассмотрим сам контракт Diamond, а затем поймем как правильно и в каком порядке нужно деплоить Diamond и грани.</p><p>Контракт Diamond:</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { LibDiamond } from "./libraries/LibDiamond.sol";
+import { IDiamondCut } from "./interfaces/IDiamondCut.sol";
+
+error FunctionNotFound(bytes4 _functionSelector);
+
+struct DiamondArgs {
+    address owner;
+    address init;
+    bytes initCalldata;
+}
+
+contract Diamond {    
+
+    constructor(IDiamondCut.FacetCut[] memory _diamondCut, DiamondArgs memory _args) payable {
+        LibDiamond.setContractOwner(_args.owner);
+        LibDiamond.diamondCut(_diamondCut, _args.init, _args.initCalldata);
+				// здесь может быть добавлен какой-то дополнительный код 
+				// для инициализации каких-то переменных в сторадже
+    }
+
+    fallback() external payable {
+				// объявляем переменную хранилища
+        LibDiamond.DiamondStorage storage ds;
+        bytes32 position = LibDiamond.DIAMOND_STORAGE_POSITION;
+        // получаем хранилище, указав слот, через который к хранилищу можно обратиться
+        assembly {
+            ds.slot := position
+        }
+        // получаем адрес грани по селектору функции
+        address facet = ds.facetAddressAndSelectorPosition[msg.sig].facetAddress;
+				// если грань не была добавлена, возвращаем ошибку
+        if(facet == address(0)) { 
+            revert FunctionNotFound(msg.sig);
+        }
+        // вызываем функцию на грани и получаем назад какое-то значение
+        assembly {
+            calldatacopy(0, 0, calldatasize())
+            let result := delegatecall(gas(), facet, 0, calldatasize(), 0, 0)
+            returndatacopy(0, 0, returndatasize())
+            switch result
+                case 0 {
+                    revert(0, returndatasize())
+                }
+                default {
+                    return(0, returndatasize())
+                }
+        }
+    }
+
+    receive() external payable {}
+}</code></pre><p>Приступим к тестированию, полный код тестирования можно посмотреть также на github.</p><pre><code class="typescript">let diamondCutFacet: DiamondCutFacet;
+let diamondLoupeFacet: DiamondLoupeFacet;
+let ownershipFacet: OwnershipFacet;
+let constantsFacet: ConstantsFacet;
+let balancesFacet: BalancesFacet;
+let allowancesFacet: AllowancesFacet;
+let supplyRegulatorFacet: SupplyRegulatorFacet;
+
+interface FacetCut {
+    facetAddress: string,
+    action: FacetCutAction,
+    functionSelectors: string[]
+}
+
+interface FacetToAddress {
+    [key: string]: string
+}
+
+let diamondInit: DiamondInit;
+
+let owner: SignerWithAddress, admin: SignerWithAddress, 
+user1: SignerWithAddress, user2: SignerWithAddress, user3: SignerWithAddress;
+
+const totalSupply = parseEther('100000');
+const transferAmount = parseEther('1000');
+const name = "Token Name";
+const symbol = "SYMBOL";
+const decimals = 18;
+
+beforeEach(async () => {
+    [owner, admin, user1, user2, user3] = await ethers.getSigners();
+});
+
+enum FacetCutAction {
+    Add,
+    Replace,
+    Remove
+}
+
+let calldataAfterDeploy: string;
+let addressDiamond: string;
+
+let facetToAddressImplementation: FacetToAddress = {};
+
+// массив с инструкциями по части добавления новых граней и селекторов
+let facetCuts: FacetCut[] = [];
+
+// обслуживающие грани и сам Diamond
+
+const FacetNames = [
+    'DiamondCutFacet',
+    'DiamondLoupeFacet',
+    'OwnershipFacet'
+];
+// сначала деплоим обслуживающие грани, без которых Diamond не сможет существовать как Diamond
+// если эти грани уже задеплоены, они могут быть использованы повторно
+mocha.step("Деплой обязательных граней для обслуживания Diamond", async function() {
+    for (const FacetName of FacetNames) {
+        const Facet = await ethers.getContractFactory(FacetName)
+        const facet = await Facet.deploy()
+        await facet.deployed();
+				// наполняем массив, указывая адрес грани, действие(добавить) и
+				// и массив с селекторами, которые были получены с помощью кастомного хелпера
+				// код также можно найти в проекте на github
+        facetCuts.push({
+          facetAddress: facet.address,
+          action: FacetCutAction.Add,
+          functionSelectors: getSelectors(facet)
+        });
+				// записываем имя грани и адрес, куда грань быда задеплоена
+        facetToAddressImplementation[FacetName] = facet.address;
+    };
+});
+
+// деплой Diamond, в качестве аргумента передаем массив с инструкциями facetCuts
+// и прочие аргументы в diamondArgs
+mocha.step("Деплой контракта Diamond", async function () {
+    const diamondArgs = {
+        owner: owner.address, // адрес владельца, который может менять имплементации
+        init: ethers.constants.AddressZero, // нулевой адрес, так как нам ничего не нужно инициализировать
+        initCalldata: '0x00' // пустая коллдата, так как нам ничего не нужно вызывать для инициализации
+    };
+    const Diamond = await ethers.getContractFactory('Diamond')
+    const diamond = await Diamond.deploy(facetCuts, diamondArgs)
+    await diamond.deployed();
+    addressDiamond = diamond.address;
+});
+
+// созадем инстансы контрактов, но в качестве адреса указывваем адрем Diamond,
+// так как для всех операция он является единственной точкой входа
+mocha.step("Инициализация обслуживающих контрактов", async function () {
+    diamondCutFacet = await ethers.getContractAt('DiamondCutFacet', addressDiamond);
+    diamondLoupeFacet = await ethers.getContractAt('DiamondLoupeFacet', addressDiamond);
+    ownershipFacet = await ethers.getContractAt('OwnershipFacet', addressDiamond);
+});
+
+// в последующих проверках обращаемся к грани DiamondLoupeFacet, 
+// чтобы убедиться, что обслуживающие грани были добавлены и что сама грань DiamondLoupeFacet
+// работает корректно
+mocha.step("Убеждаемся в том, что адреса граней на контракте совпадают с теми, которые были получены при деплое имплементаций", async function () {
+    const addresses = [];
+    for (const address of await diamondLoupeFacet.facetAddresses()) {
+        addresses.push(address)
+    }
+    assert.sameMembers(Object.values(facetToAddressImplementation), addresses)
+});
+
+mocha.step("Получим селекторы функций по адресам их граней", async function () {
+    let selectors = getSelectors(diamondCutFacet)
+    let result = await diamondLoupeFacet.facetFunctionSelectors(facetToAddressImplementation['DiamondCutFacet'])
+    assert.sameMembers(result, selectors)
+    selectors = getSelectors(diamondLoupeFacet)
+    result = await diamondLoupeFacet.facetFunctionSelectors(facetToAddressImplementation['DiamondLoupeFacet'])
+    assert.sameMembers(result, selectors)
+    selectors = getSelectors(ownershipFacet)
+    result = await diamondLoupeFacet.facetFunctionSelectors(facetToAddressImplementation['OwnershipFacet'])
+    assert.sameMembers(result, selectors)
+});
+
+mocha.step("Получим адреса граней по селекторам, кторые относятся к этим граням", async function () {
+    assert.equal(
+        facetToAddressImplementation['DiamondCutFacet'],
+        await diamondLoupeFacet.facetAddress('0x1f931c1c') //diamondCut(FacetCut[] calldata _diamondCut, address _init, bytes calldata _calldata)
+    )
+    assert.equal(
+        facetToAddressImplementation['DiamondLoupeFacet'],
+        await diamondLoupeFacet.facetAddress('0x7a0ed627') // facets()
+    )
+    assert.equal(
+        facetToAddressImplementation['DiamondLoupeFacet'],
+        await diamondLoupeFacet.facetAddress('0xadfca15e') // facetFunctionSelectors(address _facet)
+    )
+    assert.equal(
+        facetToAddressImplementation['OwnershipFacet'],
+        await diamondLoupeFacet.facetAddress('0xf2fde38b') // transferOwnership(address _newOwner)
+    )
+});
+
+mocha.step("Трансфер права менять имплементации и обратно", async function () {
+    await ownershipFacet.connect(owner).transferOwnership(admin.address);
+    assert.equal(await ownershipFacet.owner(), admin.address);
+    await ownershipFacet.connect(admin).transferOwnership(owner.address);
+    assert.equal(await ownershipFacet.owner(), owner.address);
+});</code></pre><p>Мы развернули базовую часть Diamond, которая необходима для управления имплементациями. Теперь реализуем на Diamond функционал токена ERC20, со всеми функциями, которые присущи этому стандарту.</p><p>Все хранилище токена будет разбито на три стораджа, к которым будут обращаться 4 грани, рассмотрим архитектуру граней и стораджей на диаграмме:</p><figure class="full-width "><img src="https://habrastorage.org/r/w780q1/getpro/habr/upload_files/38c/cba/803/38ccba803d743f3a4ef96f5c3d841d52.jpg" alt="Архитектура ERC20 в контексте нашего Diamond" title="Архитектура ERC20 в контексте нашего Diamond" width="4448" height="2567" data-src="https://habrastorage.org/getpro/habr/upload_files/38c/cba/803/38ccba803d743f3a4ef96f5c3d841d52.jpg" data-blurred="true"/><figcaption>Архитектура ERC20 в контексте нашего Diamond</figcaption></figure><p>Библиотека LibConstants будет отвечать за хранение таких констант токена, как name, symbol, decimals и адрес админа, которому будут доступны функции mint(), burn() из грани SupplyRegulatorFacet.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+error NotTokenAdmin();
+
+library LibConstants {
+		// слот, через который можно обратиться к ConstantsStates
+    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256("erc20.constants");
+
+    event AdminshipTransferred(address indexed previousAdmin, address indexed newAdmin);
+
+		// переменные в хранилище "erc20.constants"
+    struct ConstantsStates {
+        string name;
+        string symbol;
+        uint8 decimals;
+        address admin;
+    }
+
+    function diamondStorage() internal pure returns (ConstantsStates storage ds) {
+        bytes32 position = DIAMOND_STORAGE_POSITION;
+        assembly {
+            ds.slot := position
+        }
+    }
+
+		// проверка на то, что отправитель является админом
+    function enforceIsTokenAdmin() internal view {
+        if(msg.sender != diamondStorage().admin) {
+            revert NotTokenAdmin();
+        }        
+    }
+
+		// функция установки нового админа
+    function setTokenAdmin(address _newAdmin) internal {
+        ConstantsStates storage ds = diamondStorage();
+        address previousAdmin = ds.admin;
+        ds.admin = _newAdmin;
+        emit AdminshipTransferred(previousAdmin, _newAdmin);
+    }
+}</code></pre><p>Следующая библиотека LibBalances отвечает за хранение балансов и сопутствующих функций:</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+library LibBalances {
+		// слот, через который можно обратиться к BalancesStates
+    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256("erc20.balances");
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+		
+		// переменные в хранилище "erc20.balances"
+    struct BalancesStates {
+        mapping(address => uint256) balances;
+        uint256 totalSupply;
+    }
+
+    function diamondStorage() internal pure returns (BalancesStates storage ds) {
+        bytes32 position = DIAMOND_STORAGE_POSITION;
+        assembly {
+            ds.slot := position
+        } 
+    }
+
+		// внутренние функции transfer, mint, burn, взятые прямиком из стандарта erc20 от openzeppelin
+    function transfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
+        BalancesStates storage ds = diamondStorage();
+        require(from != address(0), "ERC20: transfer from the zero address");
+        require(to != address(0), "ERC20: transfer to the zero address");
+
+        uint256 fromBalance = ds.balances[from];
+        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+        unchecked {
+            ds.balances[from] = fromBalance - amount;
+            ds.balances[to] += amount;
+        }
+        emit Transfer(from, to, amount);
+    }
+
+    function mint(address account, uint256 amount) internal {
+        BalancesStates storage ds = diamondStorage();
+        require(account != address(0), "ERC20: mint to the zero address");
+        ds.totalSupply += amount;
+        unchecked {
+            ds.balances[account] += amount;
+        }
+        emit Transfer(address(0), account, amount);
+    }
+
+    function burn(address account, uint256 amount) internal {
+        BalancesStates storage ds = diamondStorage();
+        require(account != address(0), "ERC20: burn from the zero address");
+        uint256 accountBalance = ds.balances[account];
+        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+        unchecked {
+            ds.balances[account] = accountBalance - amount;
+            ds.totalSupply -= amount;
+        }
+        emit Transfer(account, address(0), amount);
+    }
+}</code></pre><p>Для инициализации констант из библиотеки LibConstants нужен отдельный контракт с функцией инициализации, которая будет вызвана сразу после добавления грани в Diamond.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// импорт библиотек, хранилище которых нужно проинициализировать
+import { LibConstants } from "../libraries/LibConstants.sol";
+import { LibBalances } from "../libraries/LibBalances.sol";
+
+contract DiamondInit {    
+		// фунция инициализации переменных
+    function initERC20(string calldata _name, string calldata _symbol, uint8 _decimals, address _admin, uint256 _totalSupply) external {
+        LibConstants.ConstantsStates storage constantsStorage = LibConstants.diamondStorage();
+				// инициализируем переменные:
+        constantsStorage.name = _name;
+        constantsStorage.symbol = _symbol;
+        constantsStorage.decimals = _decimals;
+        constantsStorage.admin = _admin;
+				// формируем первоначальное предложение, обращаясь к соотвествующей библиотеке
+        LibBalances.mint(_admin, _totalSupply);
+    }
+}</code></pre><p>Наконец напишем контракт грани, которая будет возвращать некоторые константы, обращаясь к библиотеке LibConstants:</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { LibConstants } from "../libraries/LibConstants.sol";
+
+contract ConstantsFacet {
+
+		// обычные view функции присущие стандарту ERC20: name, symbol, decimals
+    function name() external view returns (string memory) {
+        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();
+        return ds.name;
+    }
+
+    function symbol() external view returns (string memory) {
+        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();
+        return ds.symbol;
+    }
+
+    function decimals() external view returns (uint8) {
+        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();
+        return ds.decimals;
+    }
+
+		// посмотреть текущего админа
+    function admin() external view returns (address) {
+        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();
+        return ds.admin;
+    }
+		
+		// функция передачи админских прав на токен
+    function transferAdminship(address _newAdmin) external {
+				// проверяем на то, что отправитель это текущий админ
+        LibConstants.enforceIsTokenAdmin();
+				//устанавливаем нового админа
+        LibConstants.setTokenAdmin(_newAdmin);
+    } 
+}</code></pre><p>Продолжим тестирование, в ходе которого мы проинициализируем переменные хранилища, с помощью функции initERC20 из контракта DiamondInit, а также добавим новую грань ConstantsFacet:</p><pre><code class="typescript">mocha.step("Деплой контракта который инициализирует значения переменных для функций name(), symbol() и т. д. во время вызова функции diamondCut", async function() {
+    const DiamondInit = await ethers.getContractFactory('DiamondInit');
+    diamondInit = await DiamondInit.deploy();
+    await diamondInit.deployed();
+});
+
+mocha.step("Формирование calldata, которая будет вызвана из Diamond через delegatecall для инициализации переменных, во время вызова функции diamondCut", async function () {
+		// указываем значения, которые будут проинициализированы во время вызова функции initERC20
+    calldataAfterDeploy = diamondInit.interface.encodeFunctionData('initERC20', [
+        name,
+        symbol,
+        decimals,
+        admin.address,
+        totalSupply
+    ]);
+});
+
+mocha.step("Деплой имплементации(грани) с константами", async function () {
+    const ConstantsFacet = await ethers.getContractFactory("ConstantsFacet");
+    const constantsFacet = await ConstantsFacet.deploy();
+    constantsFacet.deployed();
+    const facetCuts = [{
+        facetAddress: constantsFacet.address,
+        action: FacetCutAction.Add,
+        functionSelectors: getSelectors(constantsFacet)
+    }];
+		// два последних аргумента: адрес контракта с функцией для инициализации, колдата для вызова этой функцией, которой есть эти значения
+    await diamondCutFacet.connect(owner).diamondCut(facetCuts, diamondInit.address, calldataAfterDeploy);
+    facetToAddressImplementation['ConstantsFacet'] = constantsFacet.address;
+});
+
+// указываем в инстансе адрес Diamond, как точку входа
+mocha.step("Инициализация имплементации c константами", async function () {
+    constantsFacet = await ethers.getContractAt('ConstantsFacet', addressDiamond);
+});
+
+mocha.step("Проверка констант на наличие", async function () {
+    assert.equal(await constantsFacet.name(), "Token Name");
+    assert.equal(await constantsFacet.symbol(), symbol);
+    assert.equal(await constantsFacet.decimals(), decimals);
+    assert.equal(await constantsFacet.admin(), admin.address);
+});</code></pre><p>Напишем ещё одну грань для нашего контракта, благодаря которой мы сможем вызывать функцию transfer и передавать наши токены другим адресам.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import { LibBalances } from "../libraries/LibBalances.sol";
+
+contract BalancesFacet {
+		// реализация функций из стандарта erc20:
+    function totalSupply() external view returns (uint256) {
+        LibBalances.BalancesStates storage ds = LibBalances.diamondStorage();
+        return ds.totalSupply;
+    }
+
+    function balanceOf(address _account) external view returns (uint256) {
+        LibBalances.BalancesStates storage ds = LibBalances.diamondStorage();
+        return ds.balances[_account];
+    }
+
+    function transfer(address _to, uint256 _amount) external returns (bool) {
+        address owner = msg.sender;
+        LibBalances.transfer(owner, _to, _amount);
+        return true;
+    }
+}</code></pre><p>Продолжим тестирование в ходе которого в контракт будет добавлена грань BalancesFacet:</p><pre><code class="typescript">// деплой грани BalancesFacet
+mocha.step("Деплой имплементации с функцией трансфера", async function () {
+    const BalancesFacet = await ethers.getContractFactory("BalancesFacet");
+    const balancesFacet = await BalancesFacet.deploy();
+    balancesFacet.deployed();
+    const facetCuts = [{
+        facetAddress: balancesFacet.address,
+        action: FacetCutAction.Add,
+        functionSelectors: getSelectors(balancesFacet)
+    }];
+		// добавление грани в контракт
+    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, "0x00");
+    facetToAddressImplementation['BalancesFacet'] = balancesFacet.address;
+});
+
+// указываем инстансу адрес Diamond как точку входа
+mocha.step("Инициализация имплементации c балансами и трансфером", async function () {
+    balancesFacet = await ethers.getContractAt('BalancesFacet', addressDiamond);
+});
+
+// убеждаемся, что функции из грани работают
+mocha.step("Проверка view функции имплементации с балансами и трансфером", async function () {
+    expect(await balancesFacet.totalSupply()).to.be.equal(totalSupply);
+    expect(await balancesFacet.balanceOf(admin.address)).to.be.equal(totalSupply);
+});
+
+mocha.step("Проверка трансфера", async function () {
+    await balancesFacet.connect(admin).transfer(user1.address, transferAmount);
+    expect(await balancesFacet.balanceOf(admin.address)).to.be.equal(totalSupply.sub(transferAmount));
+    expect(await balancesFacet.balanceOf(user1.address)).to.be.equal(transferAmount);
+    await balancesFacet.connect(user1).transfer(admin.address, transferAmount);
+});</code></pre><p>Наконец напишем грань, после добавления которой у нас будет полноценный erc20, а именно возможность апрувить токены и переводить их с другого адреса используя transferFrom, помимо самой грани нам ещё нужна библиотека для обслуживания хранилища, в котором будет записано, кто сколько кому заапрувил.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+library LibAllowances {
+		// слот, через который можно обратиться к AllowancesStates
+    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256("erc20.allowances");
+
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+		// переменные в хранилище "erc20.allowances"
+    struct AllowancesStates {
+        mapping(address => mapping(address => uint256)) allowances;
+    }
+
+    function diamondStorage() internal pure returns (AllowancesStates storage ds) {
+        bytes32 position = DIAMOND_STORAGE_POSITION;
+        assembly {
+            ds.slot := position
+        } 
+    }
+
+		// функция апрува
+    function approve(
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) internal {
+        AllowancesStates storage ds = diamondStorage();
+        require(_owner != address(0), "ERC20: approve from the zero address");
+        require(_spender != address(0), "ERC20: approve to the zero address");
+
+        ds.allowances[_owner][_spender] = _amount;
+        emit Approval(_owner, _spender, _amount);
+    }
+
+		// функция, вызываемая после траты заапрувленной суммы
+    function spendAllowance(
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) internal {
+        AllowancesStates storage ds = diamondStorage();
+        uint256 currentAllowance = ds.allowances[_owner][_spender];
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= _amount, "ERC20: insufficient allowance");
+            unchecked {
+                approve(_owner, _spender, currentAllowance - _amount);
+            }
+        }
+    }
+}</code></pre><p> Контракт грани:</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+// импортируем библиотеки, к хранилищам которых нам нужно обратиться
+import { LibBalances } from "../libraries/LibBalances.sol";
+import { LibAllowances } from "../libraries/LibAllowances.sol";
+
+contract AllowancesFacet {
+		// оставшиеся функции необходимые для реализации ERC20
+		// view функция для получения значения заапрувленной суммы
+    function allowance(address _owner, address _spender) external view returns (uint256) {
+        LibAllowances.AllowancesStates storage ds = LibAllowances.diamondStorage();
+        return ds.allowances[_owner][_spender];
+    }
+
+		// функция одобрения какой-то суммы на адрес
+    function approve(address _spender, uint256 _amount) external returns (bool) {
+        address owner = msg.sender;
+        LibAllowances.approve(owner, _spender, _amount);
+        return true;
+    }
+
+		// функция трансфера одобренной суммы
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _amount
+    ) external returns (bool) {
+        address spender = msg.sender;
+        LibAllowances.spendAllowance(_from, spender, _amount);
+        LibBalances.transfer(_from, _to, _amount);
+        return true;
+    }
+}</code></pre><p>Вернемся к тестированию, добавим грань AllowancesFacet и проверим корректно ли она работает, порядок деплоя и добавления ничем не отличается от предыдущих граней:</p><pre><code class="typescript">mocha.step("Деплой имплементации с allowances", async function () {
+    const AllowancesFacet = await ethers.getContractFactory("AllowancesFacet");
+    const allowancesFacet = await AllowancesFacet.deploy();
+    allowancesFacet.deployed();
+    const facetCuts = [{
+        facetAddress: allowancesFacet.address,
+        action: FacetCutAction.Add,
+        functionSelectors: getSelectors(allowancesFacet)
+    }];
+    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, "0x00");
+    facetToAddressImplementation['ConstantsFacet'] = allowancesFacet.address;
+});
+
+mocha.step("Инициализация имплементации c балансами и трансфером allowance, approve, transferFrom и т. д.", async function () {
+    allowancesFacet = await ethers.getContractAt('AllowancesFacet', addressDiamond);
+});
+
+mocha.step("Тестрирование функций allowance, approve, transferFrom", async function () {
+    expect(await allowancesFacet.allowance(admin.address, user1.address)).to.equal(0);
+    const valueForApprove = parseEther("100");
+    const valueForTransfer = parseEther("30");
+    await allowancesFacet.connect(admin).approve(user1.address, valueForApprove);
+    expect(await allowancesFacet.allowance(admin.address, user1.address)).to.equal(valueForApprove);
+    await allowancesFacet.connect(user1).transferFrom(admin.address, user2.address, valueForTransfer);
+    expect(await balancesFacet.balanceOf(user2.address)).to.equal(valueForTransfer);
+    expect(await balancesFacet.balanceOf(admin.address)).to.equal(totalSupply.sub(valueForTransfer));
+    expect(await allowancesFacet.allowance(admin.address, user1.address)).to.equal(valueForApprove.sub(valueForTransfer));
+});</code></pre><p>Напишем ещё одну грань, которая будет регулировать эмиссию токена, в ней будет две функции: mint и burn, их сможет вызывать только админ, который был проинициализирован в функции initERC20.</p><pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+// импорт нужных библиотек
+import { LibBalances } from "../libraries/LibBalances.sol";
+import { LibConstants } from "../libraries/LibConstants.sol";
+
+contract SupplyRegulatorFacet {
+    
+    function mint(address _account, uint256 _amount) external {
+        LibConstants.enforceIsTokenAdmin(); // проверка на то, что функцию вызывает админ
+        LibBalances.mint(_account, _amount);
+    }
+
+    function burn(address _account, uint256 _amount) external {
+        LibConstants.enforceIsTokenAdmin(); // проверка на то, что функцию вызывает админ
+        LibBalances.burn(_account, _amount); 
+    }
+}</code></pre><p>Продолжим тестирование:</p><pre><code class="typescript">mocha.step("Деплой имплементации с mint и burn", async function () {
+    const SupplyRegulatorFacet = await ethers.getContractFactory("SupplyRegulatorFacet");
+    supplyRegulatorFacet = await SupplyRegulatorFacet.deploy();
+    supplyRegulatorFacet.deployed();
+    const facetCuts = [{
+        facetAddress: supplyRegulatorFacet.address,
+        action: FacetCutAction.Add,
+        functionSelectors: getSelectors(supplyRegulatorFacet)
+    }];
+    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, "0x00");
+    facetToAddressImplementation['SupplyRegulatorFacet'] = supplyRegulatorFacet.address;
+});
+
+mocha.step("Инициализация имплементации c функциями mint и burn", async function () {
+    supplyRegulatorFacet = await ethers.getContractAt('SupplyRegulatorFacet', addressDiamond);
+});
+
+mocha.step("Проверка функций mint и burn", async function () {
+    const mintAmount = parseEther('1000');
+    const burnAmount = parseEther('500');
+    await supplyRegulatorFacet.connect(admin).mint(user3.address, mintAmount);
+    expect(await balancesFacet.balanceOf(user3.address)).to.equal(mintAmount);
+    expect(await balancesFacet.totalSupply()).to.be.equal(totalSupply.add(mintAmount));
+    await supplyRegulatorFacet.connect(admin).burn(user3.address, burnAmount);
+    expect(await balancesFacet.balanceOf(user3.address)).to.equal(mintAmount.sub(burnAmount));
+    expect(await balancesFacet.totalSupply()).to.be.equal(totalSupply.add(mintAmount).sub(burnAmount));
+});</code></pre><p>На этом тестирование функционала ERC20 закончено и мы можем отметить что работает оно корректно. Но, что если мы хоти сделать Diamond не обновляемым, например, в процессе разработке мы пришли к какой-то стабильной версии контракт и нас больше нет необходимости вызывать функцию diamondCut? Для это мы просто удалим селектор функции diamondCut:  </p><pre><code class="typescript">mocha.step("Удаление функции diamondCut для дальнейшей неизменяемости", async function () {
+    const facetCuts = [{
+        facetAddress: ethers.constants.AddressZero,
+        action: FacetCutAction.Remove,
+        functionSelectors: ['0x1f931c1c'] //diamondCut(FacetCut[] calldata _diamondCut, address _init, bytes calldata _calldata)
+    }];
+    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, "0x00");
+});</code></pre><p>После выполнения этого действия контракт станет не обновляемым и статичным, так что будьте осторожны, если решитесь удалить функцию diamondCut из Diamond.</p><h2>Послесловие</h2><p>Ссылка на видео-туториал и подробное объяснение: <a href="https://www.youtube.com/watch?v=42TUqDW74v8" rel="noopener noreferrer nofollow">https://www.youtube.com/watch?v=42TUqDW74v8</a></p><p>GitHub: <a href="https://github.com/davydovMikhail/multi-proxy-contract" rel="noopener noreferrer nofollow">https://github.com/davydovMikhail/multi-proxy-contract</a></p><p>Остались вопросы? С чем-то не согласны? Пишите комментарии</p><p>Поддержать автора криптовалютой: 0x021Db128ceab47C66419990ad95b3b180dF3f91F</p><p></p></div></div></div> <!----> <!----></div> <!----> <!----></div> <!----> <div class="tm-article-presenter__meta"><div class="tm-separated-list tm-article-presenter__meta-list"><span class="tm-separated-list__title">Теги:</span> <ul class="tm-separated-list__list"><li class="tm-separated-list__item"><a href="/ru/search/?target_type=posts&amp;order=relevance&amp;q=%5BDiamond%5D" class="tm-tags-list__link">Diamond</a></li><li class="tm-separated-list__item"><a href="/ru/search/?target_type=posts&amp;order=relevance&amp;q=%5B%D0%BF%D1%80%D0%BE%D0%BA%D1%81%D0%B8%5D" class="tm-tags-list__link">прокси</a></li><li class="tm-separated-list__item"><a href="/ru/search/?target_type=posts&amp;order=relevance&amp;q=%5B%D0%BC%D1%83%D0%BB%D1%82%D0%B8%D0%BF%D1%80%D0%BE%D0%BA%D1%81%D0%B8%5D" class="tm-tags-list__link">мултипрокси</a></li><li class="tm-separated-list__item"><a href="/ru/search/?target_type=posts&amp;order=relevance&amp;q=%5Beip2535%5D" class="tm-tags-list__link">eip2535</a></li><li class="tm-separated-list__item"><a href="/ru/search/?target_type=posts&amp;order=relevance&amp;q=%5BSolidity%5D" class="tm-tags-list__link">Solidity</a></li><li class="tm-separated-list__item"><a href="/ru/search/?target_type=posts&amp;order=relevance&amp;q=%5B%D0%BC%D0%BE%D0%B4%D1%83%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D1%81%D0%BC%D0%B0%D1%80%D1%82%20%D0%BA%D0%BE%D0%BD%D1%82%D1%80%D0%B0%D0%BA%D1%82%5D" class="tm-tags-list__link">модульный смарт контракт</a></li><li class="tm-separated-list__item"><a href="/ru/search/?target_type=posts&amp;order=relevance&amp;q=%5B%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D1%8F%D0%B5%D0%BC%D1%8B%D0%B9%20%D0%BA%D0%BE%D0%BD%D1%82%D1%80%D0%B0%D0%BA%D1%82%5D" class="tm-tags-list__link">обновляемый контракт</a></li></ul></div> <div class="tm-separated-list tm-article-presenter__meta-list"><span class="tm-separated-list__title">Хабы:</span> <ul class="tm-separated-list__list"><li class="tm-separated-list__item"><a href="/ru/hub/p2p/" class="tm-hubs-list__link">Децентрализованные сети</a></li><li class="tm-separated-list__item"><a href="/ru/hub/programming/" class="tm-hubs-list__link">Программирование</a></li><li class="tm-separated-list__item"><a href="/ru/hub/solidity/" class="tm-hubs-list__link">Solidity</a></li><li class="tm-separated-list__item"><a href="/ru/hub/distributed_systems/" class="tm-hubs-list__link">Распределённые системы</a></li><li class="tm-separated-list__item"><a href="/ru/hub/cryptocurrency/" class="tm-hubs-list__link">Криптовалюты</a></li></ul></div></div></article></div> <!----></div> <div class="tm-article-sticky-panel"><div class="tm-data-icons tm-article-sticky-panel__icons"><div class="tm-article-rating tm-data-icons__item"><div class="tm-votes-meter tm-article-rating__votes-switcher"><svg height="24" width="24" class="tm-svg-img tm-votes-meter__icon tm-votes-meter__icon tm-votes-meter__icon_appearance-article"><title>Всего голосов 5: ↑4 и ↓1</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#counter-rating"></use></svg> <span title="Всего голосов 5: ↑4 и ↓1" class="tm-votes-meter__value tm-votes-meter__value tm-votes-meter__value_positive tm-votes-meter__value_appearance-article tm-votes-meter__value_rating">+3</span></div> <DIV class="v-portal" style="display:none;"></DIV></div> <!----> <!----> <button title="Добавить в закладки" type="button" class="bookmarks-button tm-data-icons__item"><span class="tm-svg-icon__wrapper bookmarks-button__icon"><svg height="24" width="24" class="tm-svg-img tm-svg-icon"><title>Добавить в закладки</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#counter-favorite"></use></svg></span> <span title="Количество пользователей, добавивших публикацию в закладки" class="bookmarks-button__counter">
+    8
+  </span></button> <div title="Читать комментарии" class="tm-article-comments-counter-link tm-data-icons__item"><a href="/ru/post/709642/comments/" class="tm-article-comments-counter-link__link"><svg height="24" width="24" class="tm-svg-img tm-article-comments-counter-link__icon"><title>Комментарии</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#counter-comments"></use></svg> <span class="tm-article-comments-counter-link__value">
+      2
+    </span></a> <!----></div> <div title="Поделиться" class="tm-sharing tm-data-icons__item"><button type="button" class="tm-sharing__button"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="tm-sharing__icon"><path fill="currentColor" d="M13.8 13.8V18l7.2-6.6L13.8 5v3.9C5 8.9 3 18.6 3 18.6c2.5-4.4 6-4.8 10.8-4.8z"></path></svg></button> <DIV class="v-portal" style="display:none;"></DIV></div> <DIV class="v-portal" style="display:none;"></DIV></div> </div></div> <DIV class="v-portal" style="display:none;"></DIV> <div class="tm-article-presenter__footer"><div class="tm-article-blocks"><!----> <div></div> <section class="tm-block tm-block tm-block_spacing-bottom"><!----> <div class="tm-block__body tm-block__body tm-block__body_variant-balanced"><div class="tm-article-author"> <div class="tm-user-card tm-article-author__user-card tm-user-card tm-user-card_variant-article"><div class="tm-user-card__info-container"><div class="tm-user-card__header"><div class="tm-user-card__header-data"><a href="/ru/users/justDeveloper23/" class="tm-user-card__userpic tm-user-card__userpic_size-40"><div class="tm-entity-image"><svg class="tm-svg-img tm-image-placeholder tm-image-placeholder_pink"><!----> <use xlink:href="/img/megazord-v28.2b11c25e..svg#placeholder-user"></use></svg></div></a> <div class="tm-user-card__meta"><div title=" 7 голосов " class="tm-counter-container tm-karma tm-karma"><div class="tm-counter-container__header"><div class="tm-karma__votes tm-karma__votes_positive">
+      3
+    </div></div> <div class="tm-counter-container__footer"><div class="tm-karma__text">
+      Карма
+    </div> <DIV class="v-portal" style="display:none;"></DIV></div></div> <div title="Рейтинг пользователя" class="tm-counter-container"><div class="tm-counter-container__header"> <div class="tm-votes-lever tm-votes-lever tm-votes-lever_appearance-rating"><!----> <div class="tm-votes-lever__score tm-votes-lever__score tm-votes-lever__score_appearance-rating"><span class="tm-votes-lever__score-counter tm-votes-lever__score-counter tm-votes-lever__score-counter_rating">
+        0
+      </span></div> <!----></div></div> <div class="tm-counter-container__footer"><span class="tm-rating__text tm-rating__text">
+      Рейтинг
+    </span></div></div></div></div></div> <div class="tm-user-card__info tm-user-card__info tm-user-card__info_variant-article"><div class="tm-user-card__title tm-user-card__title tm-user-card__title_variant-article"><span class="tm-user-card__name tm-user-card__name tm-user-card__name_variant-article">Davidoff Mikhail</span> <a href="/ru/users/justDeveloper23/" class="tm-user-card__nickname tm-user-card__nickname tm-user-card__nickname_variant-article">
+          @justDeveloper23
+        </a> <!----></div> <p class="tm-user-card__short-info tm-user-card__short-info tm-user-card__short-info_variant-article">Developer</p></div></div> <div class="tm-user-card__buttons tm-user-card__buttons tm-user-card__buttons_variant-article"><!----> <!----> <!----> <!----> <!----></div></div> <!----></div> <DIV class="v-portal" style="display:none;"></DIV></div> <!----></section> <div class="tm-adfox-banner__container tm-page-article__banner"><!----> <div id="adfox_164725660339535756" class="tm-adfox-banner tm-adfox-banner tm-adfox-banner_variant-leaderboard"></div></div> <div class="tm-article-blocks__comments"><div class="tm-article-page-comments"><div class="tm-article-comments-counter-link tm-article-comments-counter-button"><a href="/ru/post/709642/comments/" class="tm-article-comments-counter-link__link tm-article-comments-counter-link__link_button-style"><svg height="24" width="24" class="tm-svg-img tm-article-comments-counter-link__icon tm-article-comments-counter-link__icon_contrasted"><title>Комментарии</title> <use xlink:href="/img/megazord-v28.2b11c25e..svg#counter-comments"></use></svg> <span class="tm-article-comments-counter-link__value tm-article-comments-counter-link__value_contrasted">
+       Комментарии 2 
+    </span></a> <!----></div></div></div>  <section class="tm-block tm-block tm-block_spacing-bottom"><header class="tm-block__header tm-block__header tm-block__header_variant-borderless"><div class="tm-block__header-container"><h2 class="tm-block__title tm-block__title tm-block__title_variant-large">Публикации</h2> </div> <!----></header> <div class="tm-block__body tm-block__body tm-block__body_variant-condensed-slim"><div class="tm-tabs tm-tabs"><div><span class="tm-tabs__tab-item"><button class="tm-tabs__tab-link tm-tabs__tab-link tm-tabs__tab-link_active tm-tabs__tab-link_slim">
+        Лучшие за сутки
+      </button></span><span class="tm-tabs__tab-item"><button class="tm-tabs__tab-link tm-tabs__tab-link tm-tabs__tab-link_slim">
+        Похожие
+      </button></span></div> <!----></div> <div class="similar-and-daily__tab-view"><div><!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <div class="tm-placeholder-article-cards"><div class="tm-placeholder-article-card"><div class="tm-placeholder__user"><div class="tm-placeholder__user-pic loads"></div> <div class="tm-placeholder__user-date loads"></div></div> <div class="tm-placeholder-article-card__title"><div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div> <div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div></div> <div class="tm-placeholder-article-card__icons tm-placeholder__counters"><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div></div></div><div class="tm-placeholder-article-card"><div class="tm-placeholder__user"><div class="tm-placeholder__user-pic loads"></div> <div class="tm-placeholder__user-date loads"></div></div> <div class="tm-placeholder-article-card__title"><div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div> <div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div></div> <div class="tm-placeholder-article-card__icons tm-placeholder__counters"><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div></div></div><div class="tm-placeholder-article-card"><div class="tm-placeholder__user"><div class="tm-placeholder__user-pic loads"></div> <div class="tm-placeholder__user-date loads"></div></div> <div class="tm-placeholder-article-card__title"><div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div> <div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div></div> <div class="tm-placeholder-article-card__icons tm-placeholder__counters"><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div></div></div><div class="tm-placeholder-article-card"><div class="tm-placeholder__user"><div class="tm-placeholder__user-pic loads"></div> <div class="tm-placeholder__user-date loads"></div></div> <div class="tm-placeholder-article-card__title"><div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div> <div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div></div> <div class="tm-placeholder-article-card__icons tm-placeholder__counters"><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div></div></div><div class="tm-placeholder-article-card"><div class="tm-placeholder__user"><div class="tm-placeholder__user-pic loads"></div> <div class="tm-placeholder__user-date loads"></div></div> <div class="tm-placeholder-article-card__title"><div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div> <div class="tm-placeholder__line tm-placeholder-article-card__title-line loads"></div></div> <div class="tm-placeholder-article-card__icons tm-placeholder__counters"><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div><div class="tm-placeholder-data-icon"><div class="tm-placeholder__icon tm-placeholder__icon_large loads"></div> <div class="tm-placeholder__line tm-placeholder__line_icon-text"></div></div></div></div></div> <!----> <!----> <!----> <!----></div> <!----></div></div> <!----></section> <div><div><!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <div class="tm-placeholder-promo"><div class="tm-placeholder-promo__header"><div class="tm-placeholder__line tm-placeholder__line_promo-title"></div></div> <div class="tm-placeholder-promo__body"><div class="tm-placeholder-promo__posts"><div class="tm-placeholder-promo__post"><div class="tm-placeholder-promo__image"></div> <div class="tm-placeholder__line tm-placeholder__line_post-title"></div></div> <div class="tm-placeholder-promo__post"><div class="tm-placeholder-promo__image"></div> <div class="tm-placeholder__line tm-placeholder__line_post-title"></div></div> <div class="tm-placeholder-promo__post"><div class="tm-placeholder-promo__image"></div> <div class="tm-placeholder__line tm-placeholder__line_post-title"></div></div></div> <div class="tm-placeholder-promo__dots"><div class="tm-placeholder-promo__dot"></div> <div class="tm-placeholder-promo__dot"></div> <div class="tm-placeholder-promo__dot"></div></div></div></div> <!----> <!----> <!----> <!----> <!----></div></div> <div><div><!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <div class="tm-placeholder-inset tm-placeholder-salary"><div class="tm-placeholder-inset__header"><div class="tm-placeholder__line tm-placeholder__line_inset-header loads"></div></div> <div class="tm-placeholder-salary__body"><div class="tm-placeholder-salary__text"><div class="tm-placeholder__line tm-placeholder__line_salary_average"></div> <div class="tm-placeholder-salary__description"><div class="tm-placeholder__line loads"></div> <div class="tm-placeholder__line loads"></div> <div class="tm-placeholder__line loads"></div> <div class="tm-placeholder__line loads"></div></div></div> <div class="tm-placeholder-salary__image loads"></div></div> <div class="tm-placeholder-inset__footer tm-placeholder-inset__footer_salary"><div class="tm-placeholder__line tm-placeholder__line_inset-footer loads"></div></div></div> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----> <!----></div></div> <!----> </div></div></div></div></div> <div class="tm-page__sidebar"><div class="tm-layout-sidebar"><div class="tm-layout-sidebar__ads tm-layout-sidebar__ads_initial"><div class="tm-adfox-banner__container tm-layout-sidebar__banner tm-layout-sidebar__banner_top"><!----> <div id="adfox_164725680533065327" class="tm-adfox-banner tm-adfox-banner tm-adfox-banner_variant-half-page"></div></div></div> <div class="tm-sexy-sidebar tm-sexy-sidebar_initial" style="margin-top:0px;"><!----> <section data-navigatable="" tabindex="0" data-async-called="true" class="tm-block tm-stories-block tm-block tm-block_spacing-around"><header class="tm-block__header tm-block__header"><div class="tm-block__header-container"><h2 class="tm-block__title tm-block__title">Истории</h2> </div> <!----></header> <div class="tm-block__body tm-block__body tm-block__body_variant-equal-small"><div class="tm-stories-empty"><div class="tm-stories-card-empty"><div class="tm-stories-card-empty__image"></div> <div class="tm-stories-card-empty__title"><div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div></div></div><div class="tm-stories-card-empty"><div class="tm-stories-card-empty__image"></div> <div class="tm-stories-card-empty__title"><div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div></div></div><div class="tm-stories-card-empty"><div class="tm-stories-card-empty__image"></div> <div class="tm-stories-card-empty__title"><div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div></div></div><div class="tm-stories-card-empty"><div class="tm-stories-card-empty__image"></div> <div class="tm-stories-card-empty__title"><div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div></div></div><div class="tm-stories-card-empty"><div class="tm-stories-card-empty__image"></div> <div class="tm-stories-card-empty__title"><div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div></div></div><div class="tm-stories-card-empty"><div class="tm-stories-card-empty__image"></div> <div class="tm-stories-card-empty__title"><div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div> <div class="tm-stories-card-empty__title-block"></div></div></div></div> <!----></div> <!----></section> <section data-async-called="true" class="tm-block tm-block tm-block_spacing-around"><header class="tm-block__header tm-block__header"><div class="tm-block__header-container"><h2 class="tm-block__title tm-block__title">Работа</h2> </div> <!----></header> <div class="tm-block__body tm-block__body"><div class="tm-vacancies-block__item"><a href="https://career.habr.com/vacancies/blockchain_developer" target="_blank" class="tm-vacancies-block__vacancy-title">
+        Blockchain разработчик
+      </a> <div class="tm-vacancies-block__vacancies-count">
+        11
+    вакансий
+      </div></div></div> <footer class="tm-block__footer"><a href="https://career.habr.com/catalog" class="tm-block-extralink">
+      Все вакансии
+    </a></footer></section> <div class="tm-adfox-banner__container tm-layout-sidebar__banner tm-layout-sidebar__banner_bottom"><!----> <div id="adfox_164725691003361602" class="tm-adfox-banner tm-adfox-banner tm-adfox-banner_variant-medium-rectangle"></div></div></div></div></div></div></div></div></main> <!----></div> <div class="tm-footer-menu"><div class="tm-page-width"><div class="tm-footer-menu__container"><div class="tm-footer-menu__block"><p class="tm-footer-menu__block-title">
+          Ваш аккаунт
+        </p> <div class="tm-footer-menu__block-content"><ul class="tm-footer-menu__list"><li class="tm-footer-menu__list-item"><a href="/kek/v1/auth/habrahabr/?back=/ru/post/709642/&amp;hl=ru" rel="nofollow" target="_self">
+                Войти
+              </a></li><li class="tm-footer-menu__list-item"><a href="/kek/v1/auth/habrahabr-register/?back=/ru/post/709642/&amp;hl=ru" rel="nofollow" target="_self">
+                Регистрация
+              </a></li></ul></div></div><div class="tm-footer-menu__block"><p class="tm-footer-menu__block-title">
+          Разделы
+        </p> <div class="tm-footer-menu__block-content"><ul class="tm-footer-menu__list"><li class="tm-footer-menu__list-item"><a href="/ru/" class="footer-menu__item-link router-link-active">
+                Публикации
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/news/" class="footer-menu__item-link">
+                Новости
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/hubs/" class="footer-menu__item-link">
+                Хабы
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/companies/" class="footer-menu__item-link">
+                Компании
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/users/" class="footer-menu__item-link">
+                Авторы
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/sandbox/" class="footer-menu__item-link">
+                Песочница
+              </a></li></ul></div></div><div class="tm-footer-menu__block"><p class="tm-footer-menu__block-title">
+          Информация
+        </p> <div class="tm-footer-menu__block-content"><ul class="tm-footer-menu__list"><li class="tm-footer-menu__list-item"><a href="/ru/docs/help/" class="footer-menu__item-link">
+                Устройство сайта
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/docs/authors/codex/" class="footer-menu__item-link">
+                Для авторов
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/docs/companies/corpblogs/" class="footer-menu__item-link">
+                Для компаний
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/docs/docs/transparency/" class="footer-menu__item-link">
+                Документы
+              </a></li><li class="tm-footer-menu__list-item"><a href="https://account.habr.com/info/agreement" target="_blank">
+                Соглашение
+              </a></li><li class="tm-footer-menu__list-item"><a href="https://account.habr.com/info/confidential/" target="_blank">
+                Конфиденциальность
+              </a></li></ul></div></div><div class="tm-footer-menu__block"><p class="tm-footer-menu__block-title">
+          Услуги
+        </p> <div class="tm-footer-menu__block-content"><ul class="tm-footer-menu__list"><li class="tm-footer-menu__list-item"><a href="https://company.habr.com/ru/corporate-blogs/" target="_blank">
+                Корпоративный блог
+              </a></li><li class="tm-footer-menu__list-item"><a href="https://company.habr.com/ru/advertising/" target="_blank">
+                Медийная реклама
+              </a></li><li class="tm-footer-menu__list-item"><a href="https://company.habr.com/ru/native-special/" target="_blank">
+                Нативные проекты
+              </a></li><li class="tm-footer-menu__list-item"><a href="https://company.habr.com/ru/education-programs/" target="_blank">
+                Образовательные программы
+              </a></li><li class="tm-footer-menu__list-item"><a href="https://company.habr.com/ru/hello-startup/" target="_blank">
+                Стартапам
+              </a></li><li class="tm-footer-menu__list-item"><a href="/ru/megaprojects/" class="footer-menu__item-link">
+                Мегапроекты
+              </a></li></ul></div></div></div></div></div> <div class="tm-footer"><div class="tm-page-width"><div class="tm-footer__container"><!----> <div class="tm-footer__social"><a href="https://www.facebook.com/habrahabr.ru" rel="nofollow noopener noreferrer" target="_blank" class="tm-svg-icon__wrapper tm-social-icons__icon"><svg height="16" width="16" class="tm-svg-img tm-svg-icon"><title>Facebook</title> <use xlink:href="/img/social-icons-sprite.svg#social-logo-facebook"></use></svg></a><a href="https://twitter.com/habr_com" rel="nofollow noopener noreferrer" target="_blank" class="tm-svg-icon__wrapper tm-social-icons__icon"><svg height="16" width="16" class="tm-svg-img tm-svg-icon"><title>Twitter</title> <use xlink:href="/img/social-icons-sprite.svg#social-logo-twitter"></use></svg></a><a href="https://vk.com/habr" rel="nofollow noopener noreferrer" target="_blank" class="tm-svg-icon__wrapper tm-social-icons__icon"><svg height="16" width="16" class="tm-svg-img tm-svg-icon"><title>VK</title> <use xlink:href="/img/social-icons-sprite.svg#social-logo-vkontakte"></use></svg></a><a href="https://telegram.me/habr_com" rel="nofollow noopener noreferrer" target="_blank" class="tm-svg-icon__wrapper tm-social-icons__icon"><svg height="16" width="16" class="tm-svg-img tm-svg-icon"><title>Telegram</title> <use xlink:href="/img/social-icons-sprite.svg#social-logo-telegram"></use></svg></a><a href="https://www.youtube.com/channel/UCd_sTwKqVrweTt4oAKY5y4w" rel="nofollow noopener noreferrer" target="_blank" class="tm-svg-icon__wrapper tm-social-icons__icon"><svg height="16" width="16" class="tm-svg-img tm-svg-icon"><title>Youtube</title> <use xlink:href="/img/social-icons-sprite.svg#social-logo-youtube"></use></svg></a><a href="https://zen.yandex.ru/habr" rel="nofollow noopener noreferrer" target="_blank" class="tm-svg-icon__wrapper tm-social-icons__icon"><svg height="16" width="16" class="tm-svg-img tm-svg-icon"><title>Яндекс Дзен</title> <use xlink:href="/img/social-icons-sprite.svg#social-logo-zen"></use></svg></a></div> <DIV class="v-portal" style="display:none;"></DIV> <button class="tm-footer__link"><!---->
+        Настройка языка
+      </button> <a href="/ru/feedback/" class="tm-footer__link">
+        Техническая поддержка
+      </a> <a href="/berserk-mode-nope" class="tm-footer__link">
+        Вернуться на старую версию
+      </a> <div class="tm-footer-copyright"><span class="tm-copyright"><span class="tm-copyright__years">© 2006–2023, </span> <span class="tm-copyright__name"><a href="https://company.habr.com/" rel="noopener" target="_blank" class="tm-copyright__link">Habr</a></span></span></div></div></div></div> <!----> <!----></div> <div class="vue-portal-target"></div></div>
+<script>window.__INITIAL_STATE__={"adblock":{"hasAcceptableAdsFilter":false,"hasAdblock":false},"articlesList":{"articlesList":{"709642":{"id":"709642","timePublished":"2023-01-09T11:27:48+00:00","isCorporative":false,"lang":"ru","titleHtml":"Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond»","leadData":{"textHtml":"\u003Cp\u003E\u003Ca href=\"https:\u002F\u002Fwww.youtube.com\u002Fwatch?v=42TUqDW74v8\" rel=\"noopener noreferrer nofollow\"\u003EСсылка на видео-туториал и подробное объяснение\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003Cp\u003E\u003Ca href=\"https:\u002F\u002Fgithub.com\u002FdavydovMikhail\u002Fmulti-proxy-contract\" rel=\"noopener noreferrer nofollow\"\u003EGitHub\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003Cp\u003EВ этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность создавать модульные, обновляемые смарт контракты, которые обладают рядом преимуществ перед такими стандартами обновляемых контрактов как Transparent и UUPS.  \u003C\u002Fp\u003E\u003Cp\u003E\u003C\u002Fp\u003E","imageUrl":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fe07\u002F53a\u002F0d6\u002Fe0753a0d65dfa0cc4daf77a960d359d3.png","buttonTextHtml":"Читать далее","image":{"url":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fe07\u002F53a\u002F0d6\u002Fe0753a0d65dfa0cc4daf77a960d359d3.png","fit":"cover","positionY":0,"positionX":0}},"editorVersion":"2.0","postType":"article","postLabels":[],"author":{"id":"3242501","alias":"justDeveloper23","fullname":"Davidoff Mikhail","avatarUrl":null,"speciality":"Developer","scoreStats":{"score":3,"votesCount":7},"rating":0,"relatedData":null,"contacts":[],"authorContacts":[],"paymentDetails":{"paymentYandexMoney":null,"paymentPayPalMe":null,"paymentWebmoney":null}},"statistics":{"commentsCount":2,"favoritesCount":8,"readingCount":938,"score":3,"votesCount":5,"votesCountPlus":4,"votesCountMinus":1},"hubs":[{"id":"33","alias":"p2p","type":"collective","title":"Децентрализованные сети","titleHtml":"Децентрализованные сети","isProfiled":true,"relatedData":null},{"id":"359","alias":"programming","type":"collective","title":"Программирование","titleHtml":"Программирование","isProfiled":true,"relatedData":null},{"id":"21234","alias":"solidity","type":"collective","title":"Solidity","titleHtml":"Solidity","isProfiled":true,"relatedData":null},{"id":"21482","alias":"distributed_systems","type":"collective","title":"Распределённые системы","titleHtml":"Распределённые системы","isProfiled":true,"relatedData":null},{"id":"21986","alias":"cryptocurrency","type":"collective","title":"Криптовалюты","titleHtml":"Криптовалюты","isProfiled":false,"relatedData":null}],"flows":[{"id":"1","alias":"develop","title":"Разработка","titleHtml":"Разработка"},{"id":"6","alias":"admin","title":"Администрирование","titleHtml":"Администрирование"},{"id":"7","alias":"popsci","title":"Научпоп","titleHtml":"Научпоп"}],"relatedData":null,"textHtml":"\u003Cdiv xmlns=\"http:\u002F\u002Fwww.w3.org\u002F1999\u002Fxhtml\"\u003E\u003Ch2\u003EВведение\u003C\u002Fh2\u003E\u003Cp\u003E\u003Ca href=\"https:\u002F\u002Fwww.youtube.com\u002Fwatch?v=42TUqDW74v8\" rel=\"noopener noreferrer nofollow\"\u003EСсылка на видео-туториал и подробное объяснение\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003Cp\u003E\u003Ca href=\"https:\u002F\u002Fgithub.com\u002FdavydovMikhail\u002Fmulti-proxy-contract\" rel=\"noopener noreferrer nofollow\"\u003EGitHub\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003Cp\u003EВ этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность создавать модульные, обновляемые смарт контракты, которые обладают рядом преимуществ перед такими стандартами обновляемых контрактов как Transparent и UUPS.  \u003C\u002Fp\u003E\u003Cp\u003EРассмотрим причины, по которым вы можете использовать стандарт Diamond для своего проекта:  \u003C\u002Fp\u003E\u003Col\u003E\u003Cli\u003E\u003Cp\u003EDiamond имеет единый адрес proxy который используется как точка входа для обращения ко всем имплементациям, такой подход упрощает развертывание, тестирование и интеграцию с другими смарт контрактами.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EDiamond не имеет ограничений по размеру контракта, то есть суммарный размер всех ваших имплементаций может выходить далеко за 24 килобайта.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EСтандарт позволяет реализовать гибкую систему взаимодействия между гранями(facets), стораджами и библиотеками.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EС течением времени и по мере необходимости функциональность контракта может быть добавлена, заменена или вовсе удалена. Также по причине описанной в п. 2 контракт не имеет ограничений по количестве функций, которые в нем используются.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EКонтракт Diamond может быть неизменяемым, либо сразу, либо по прошевствию какого-то времени, когда будет принято решение сделать Diamond неизменяемым.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EDiamond может использовать уже развернутые имплементации, что может положительно сказаться на тратах на газ. Такой подход делает этот стандарт открытым для всех участников сети.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EИмплементации или грани(facets) независимы друг от друга, но могут совместно использовать внутренние функции, библиотеки и переменные состояния.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EДобавление\u002Fзамена\u002Fудаление сразу нескольких функций может осуществляться в одной транзакции.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EДля изменения имплементаций можно использовать DAO и прочих инициализаторов обновления контракта.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003C\u002Fol\u003E\u003Ch2\u003EТеория\u003C\u002Fh2\u003E\u003Cp\u003EDiamond вызывает функции своих граней(facet), используя delegatecall, если кому-то нужно вспомнить или узнать как работает delegatecall, милости прошу: \u003Ca href=\"https:\u002F\u002Fsolidity-by-example.org\u002Fdelegatecall\u002F\" rel=\"noopener noreferrer nofollow\"\u003Esolidity-by-example\u002Fdelegatecall\u003C\u002Fa\u003E.\u003C\u002Fp\u003E\u003Cp\u003EКогда к Diamond обращается какой-то адрес и вызывает функцию из имплементации, срабатывает fallback. Как работает функция fallback: \u003Ca href=\"https:\u002F\u002Fsolidity-by-example.org\u002Ffallback\u002F\" rel=\"noopener noreferrer nofollow\"\u003Esolidity-by-example\u002Ffallback\u003C\u002Fa\u003E.\u003C\u002Fp\u003E\u003Cp\u003EВнутри функции fallback определяется на какой адрес нужно делегировать вызов на основе первых четырех байтов из msg.data, или же эти 4 байта можно получить сразу обратившись к глобальной переменной msg.sig, таким образом мы получим селектор функции. Подробнее о том что такое селектор функции и как его можно получить: \u003Ca href=\"https:\u002F\u002Fsolidity-by-example.org\u002Ffunction-selector\u002F\" rel=\"noopener noreferrer nofollow\"\u003Esolidity-by-example\u002Ffunction-selector\u003C\u002Fa\u003E.\u003C\u002Fp\u003E\u003Cp\u003EБлагодаря свойствам fallback и delegatecall, Diamond может выполнять функцию грани(facet), как если бы она была определена в самом Diamond. При вызове функции из имплементации(читай грани) благодаря delegatecall значения msg.sender и msg.value остаются неизменными, а также считывается и записывается только хранилище diamond, то есть, можно сказать, что грань(facet), к которой мы обращаемся дает только инструкцию, в которой сказано как обращаться с хранилищем diamond.\u003C\u002Fp\u003E\u003Cp\u003EРассмотрим концептуальную реализацию функции fallback() в основном контракте diamond:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003Efallback() external payable {\n  \u002F\u002F получаем адрес грани, на которую будет делегирован вызов\n  address facet = selectorTofacet[msg.sig];\n\t\u002F\u002F убеждаемся в том, что такая грань была добавлена в mapping selectorTofacet\n  require(facet != address(0));\n\t\u002F\u002F выполяняем вызов external функции из грани через delegatecall и возвращаем\n\t\u002F\u002F какое-то значение\n  assembly {\n    \u002F\u002F копируем селектор функции и аргументы\n    calldatacopy(0, 0, calldatasize())\n\t\t\u002F\u002F вызываем функцию из грани, указывая адрес этой грани    \n    let result := delegatecall(gas(), facet, 0, calldatasize(), 0, 0)\n    \u002F\u002F получаем какое-то возвращаемое значение\n    returndatacopy(0, 0, returndatasize())\n    \u002F\u002F возвращаем либо ошибку либо ответ в зависимости от значения result\n    switch result\n      case 0 {revert(0, returndatasize())}\n      default {return (0, returndatasize())}\n  }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EПодведем итоги по строению Diamond:  \u003C\u002Fp\u003E\u003Col\u003E\u003Cli\u003E\u003Cp\u003EВ контракте есть только одна функция fallback.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EВ зависимости от селектора вызов делегируется на нужную имплементацию.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EКаждому селектору соответствует свой адрес грани.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EВсе состояния хранятся на контракте Diamond, на гранях(facets) только логика.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003C\u002Fol\u003E\u003Cfigure class=\"bordered full-width \"\u003E\u003Cimg src=\"https:\u002F\u002Fhabrastorage.org\u002Fr\u002Fw1560\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F49c\u002Fe9c\u002Fa37\u002F49ce9ca37f92e4074f49cf8818c3298e.png\" alt=\"Строение Diamond\" title=\"Строение Diamond\" width=\"554\" height=\"725\" data-src=\"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F49c\u002Fe9c\u002Fa37\u002F49ce9ca37f92e4074f49cf8818c3298e.png\"\u002F\u003E\u003Cfigcaption\u003EСтроение Diamond\u003C\u002Ffigcaption\u003E\u003C\u002Ffigure\u003E\u003Ch2\u003EОрганизация хранилища  \u003C\u002Fh2\u003E\u003Cp\u003EДля облуживания стораджа контракта Diamond используются библиотеки. Количество стораджей неограниченно, они могут появляться по мере необходимости и появления нового функционала и переменных. Чтобы значения в сторадже не перепутались и не перезаписывались хаотичным образом, каждый сторадж организуется в структуру, в свою очередь структура, помещается в определенную ячейку, которая является точкой входа, для обращения к конкретной переменной структуры.\u003C\u002Fp\u003E\u003Cp\u003EРассмотрим следующий пример: мы имеем две грани, которые обращаются к одному и тому же стораджу используя библиотеку. Эти грани будут представлять из себя частичную реализацию стандарта ERC-721.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\n\u002F\u002F библиотека для обслуживания стораджа\nlibrary LibERC721 {\n\t\t\u002F\u002F получаем идентификатор стораджа\n    bytes32 constant ERC721_POSITION = keccak256(\"erc721.storage\");\n \n\t\t\u002F\u002F перечисляем в структуре стораджа состояния, к которым будем обращаться \n    struct ERC721Storage {\n        \u002F\u002F tokenId =\u003E owner\n        mapping (uint256 =\u003E address) tokenIdToOwner;\n        \u002F\u002F owner =\u003E count of tokens owned\n        mapping (address =\u003E uint256) ownerToNFTokenCount;\n        string name;\n        string symbol;   \n    }\n\n\t\t\u002F\u002F функция, возвращающая структуру стораджа из слота ERC721_POSITION\n    function getStorage() internal pure returns (ERC721Storage storage storageStruct) {\n        bytes32 position = ERC721_POSITION;\n        assembly {\n            storageStruct.slot := position\n        }\n    }\n    event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);\n\n\t\t\u002F\u002F все функции, которые есть в библиотеке должны быть internal\n    function transferFrom(address _from, address _to, uint256 _tokenId) internal {\n\t\t\t\t\u002F\u002F обращаемся к getStorage, чтобы получить структуру стораджа\n\t\t\t\t\u002F\u002F указываем ключевое слово storage, это говорит компилятору о том,\n\t\t\t\t\u002F\u002F что мы читаем и вносим изменения именно в хранилище контракта,\n\t\t\t\t\u002F\u002F а не в memory или calldata\n        ERC721Storage storage erc721Storage = LibERC721.getStorage();\n\t\t\t\t\u002F\u002F изменяем переменные так как нам нужно\n        address tokenOwner = erc721Storage.tokenIdToOwner[_tokenId];\n        require(tokenOwner == _from);\n        erc721Storage.tokenIdToOwner[_tokenId] = _to;\n        erc721Storage.ownerToNFTokenCount[_from]--;\n        erc721Storage.ownerToNFTokenCount[_to]++;\n        emit Transfer(_from, _to, _tokenId);\n    }\n}\n\u002F\u002F грань, которая реализует три метода, при этом во всех методах, получение \n\u002F\u002F и запись значений происходит из библиотеки, в свою очередь библиотека изменяет \n\u002F\u002F хранилище diamond, используя ERC721_POSITION как точку входа для обращения к стораджу,\n\u002F\u002F а struct ERC721Storage как темплейт, который показывает как правильно обратиться\n\u002F\u002F к той или иной переменной внутри контракта Diamond\ncontract ERC721Facet {\n    function name() external view returns (string memory name_) {\n        name_ = LibERC721.getStorage().name;\n    }\n    \n    function symbol() external view returns (string memory symbol_) {\n        symbol_ = LibERC721.getStorage().symbol;\n    }\n\n    function transferFrom(address _from, address _to, uint256 _tokenId) external {\n        LibERC721.transferFrom(_from, _to, _tokenId);\n    }\n}\n\u002F\u002F ещё одна грань, которая использует библиотеку\ncontract ERC721BatchTransferFacet {\n    function batchTransferFrom(address _from, address _to, uint256[] calldata _tokenIds) external {\n        for(uint256 i; i &lt; _tokenIds.length; i++) {\n          LibERC721.transferFrom(_from, _to, _tokenIds[i]);\n        }\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EКак правильно обновлять сторадж:\u003C\u002Fp\u003E\u003Col\u003E\u003Cli\u003E\u003Cp\u003EЧтобы добавить новые переменные состояния в структуру хранилища, добавьте их в самый конец структуры.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EЕсли вам нужно добавить mapping, помещайте его также в конец структуры.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EИмена переменных состояния могут быть изменены, но это может привести к путанице, если разные грани используют разные имена для одних и тех же мест хранения. Поэтому для всех граней рекомендуется использовать библиотеки где сторадж определен одинаково, как с точки зрения нейминга, так и с точки зрения порядка следования переменных в структуре.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003C\u002Fol\u003E\u003Cp\u003EЧто не следует делать при изменении стораджа:\u003C\u002Fp\u003E\u003Col\u003E\u003Cli\u003E\u003Cp\u003EНе добавляйте новые переменные состояния в начало или середину структур. Выполнение этого приводит к тому, что новая переменная состояния перезаписывает существующие данные переменной состояния и все переменные состояния после неё, так как новая переменная состояния ссылается на неправильное место хранения.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EДопустим у вас в структуре стораджа есть mapping, который возвращает другую структуру, такая практика допустима, если возвращаемая структура не будет обновляться на протяжении всего времени существования Diamond. Если же в будущем появится потребность изменить возвращаемую мапингом структуру, то вам придется создавать новый мапинг для этой структуры.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EНе добавляйте новые переменные состояния в структуры, которые используются в массивах.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EПри использовании хранилища Diamond не используйте один и тот же номер слота(ERC721_POSITION в примере) для разных хранилищ. Это очевидно. Два разных хранилища в одном и том же месте будут перезаписывать друг друга.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EНе допускайте, чтобы какая-либо грань могла вызывать \u003Ccode\u003Eselfdestruct\u003C\u002Fcode\u003E. Просто не разрешайте команде \u003Ccode\u003Eselfdestruct\u003C\u002Fcode\u003E существовать в любом исходном коде грани и не разрешайте вызывать эту команду через вызов delegatecall. Потому что \u003Ccode\u003Eselfdestruct\u003C\u002Fcode\u003E может удалить грань, которая используется алмазом, или \u003Ccode\u003Eselfdestruct\u003C\u002Fcode\u003E может быть использован для удаления основного прокси-контракта Diamond.\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003C\u002Fol\u003E\u003Cp\u003EГрани могут совместно использовать одни и те же стораджи. Грани могут использовать одни и те же внутренние функции и библиотеки. Таким образом, грани являются независимыми друг от друга единицами, но при этом они могут обращаться к одинаковым библиотекам для изменения состояния хранилища.  \u003C\u002Fp\u003E\u003Cfigure class=\"full-width \"\u003E\u003Cimg src=\"https:\u002F\u002Fhabrastorage.org\u002Fr\u002Fw1560\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fedf\u002Fff5\u002Fb61\u002Fedfff5b614d6d26fca15964d1737ae10.png\" alt=\"Пример организации архитектуры хранилища и логики граней\" title=\"Пример организации архитектуры хранилища и логики граней\" width=\"640\" height=\"360\" data-src=\"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fedf\u002Fff5\u002Fb61\u002Fedfff5b614d6d26fca15964d1737ae10.png\"\u002F\u003E\u003Cfigcaption\u003EПример организации архитектуры хранилища и логики граней\u003C\u002Ffigcaption\u003E\u003C\u002Ffigure\u003E\u003Cp\u003EНа диаграмме выше:\u003C\u002Fp\u003E\u003Cul\u003E\u003Cli\u003E\u003Cp\u003EТолько FacetA может получить доступ к DataA\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EТолько FacetB может получить доступ к DataB\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EТолько код Diamond может получить доступ к DataD\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EДоступ к DataAB имеют как FacetA так и FacetB\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003Cli\u003E\u003Cp\u003EК DataABD можно обратиться откуда угодно\u003C\u002Fp\u003E\u003C\u002Fli\u003E\u003C\u002Ful\u003E\u003Ch2\u003EДобавление\u002Fзамена\u002Fудаление функций  \u003C\u002Fh2\u003E\u003Cp\u003EЛюбой Diamond должен реализовывать интерфейс IDiamond.  \u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ninterface IDiamond {\n\t\t\u002F\u002F действие, которое нам необходимо произвести по отношение к грани и ее функциям\n    enum FacetCutAction {Add, Replace, Remove}\n    \u002F\u002F Add=0, Replace=1, Remove=2 (добавить, заменить, удалить)\n\n\t\t\u002F\u002F структура, в которой описаны действия для редактирования грани\n    struct FacetCut {\n        address facetAddress; \u002F\u002F адрес грани\n        FacetCutAction action; \u002F\u002F производимое действие\n        bytes4[] functionSelectors; \u002F\u002F массив с селекторами функций\n    }\n\n\t\t\u002F\u002F событие, которое вызывается каждый раз, \n\t\t\u002F\u002F когда грани добавляются, заменяются, удаляются\n    event DiamondCut(FacetCut[] _diamondCut, address _init, bytes _calldata);\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EВ свою очередь интерфейс IDiamond наследуется другим интерфейсом IDiamondCut, который содержит в себе одну функцию diamondCut.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { IDiamond } from \".\u002FIDiamond.sol\";\n\ninterface IDiamondCut is IDiamond {    \n\t\t\u002F\u002F _diamondCut - содержит адрес грани, селекторы и действие\n\t\t\u002F\u002F _init - адрес контракта на который будет вызвана _calldata\n\t\t\u002F\u002F в конце функции diamondCut\n    function diamondCut(\n        FacetCut[] calldata _diamondCut,\n        address _init,\n        bytes calldata _calldata\n    ) external;    \n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EФункция diamondCut обновляет любое количество функций из любого количества фасетов за одну транзакцию. Выполнение всех изменений в рамках одной транзакции предотвращает повреждение данных, которое может произойти при обновлениях, выполняемых в рамках нескольких транзакций.\u003C\u002Fp\u003E\u003Cp\u003EПосле добавления\u002Fзамены\u002Fудаления функций аргумент _calldata выполняется на адрес _init через delegatecall. Это выполнение выполняется для инициализации данных или настройки или удаления чего-либо необходимого или больше не нужного после добавления, замены и\u002Fили удаления функций. Можно провести аналогию с функцие конструктором, которая также инициализирует какие-то начальные значения.\u003C\u002Fp\u003E\u003Cp\u003EЕсли значение _init равно нулевому адресу address(0) то выполнение _calldata пропускается. В этом случае _calldata может содержать 0 байт или пользовательскую информацию, которая отправится на etherscan через событие DiamondCut.\u003C\u002Fp\u003E\u003Ch2\u003EПроверка граней и функций\u003C\u002Fh2\u003E\u003Cp\u003EDiamond должен поддерживать проверку аспектов и функций путем реализации интерфейса IDiamondLoupe.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ninterface IDiamondLoupe {\n    \u002F\u002F структура содержащая информацию о грани\n    struct Facet {\n        address facetAddress; \u002F\u002F адрес грани\n        bytes4[] functionSelectors; \u002F\u002F массив со всеми добавленными селекторами\n    }\n\n    \u002F\u002F получение полной информации по всем граням, на которые может делегировать Diamond\n    function facets() external view returns (Facet[] memory facets_);\n\n    \u002F\u002F получение селекторов всех функций грани, на которые делегирует Diamond\n    function facetFunctionSelectors(address _facet) external view returns (bytes4[] memory facetFunctionSelectors_);\n\n    \u002F\u002F получение адресов всех граней\n    function facetAddresses() external view returns (address[] memory facetAddresses_);\n\n    \u002F\u002F получение адреса грани по селектору, функция которого находится на этой грани\n    function facetAddress(bytes4 _functionSelector) external view returns (address facetAddress_);\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EТаким образом с помощью интерфейса IDiamondCut мы обновляем Diamond, а с помощью IDiamondLoupe можем отслеживать грани и их состояние на наличие тех или иных селекторов.\u003C\u002Fp\u003E\u003Ch2\u003EПрактика\u003C\u002Fh2\u003E\u003Cp\u003EНапишем обычный erc20 весь функционал которого будет разбит на 4 грани. Это будет сделано для наглядности, ведь внутренний механизм работы стандарта erc20 известен всем или многим.\u003C\u002Fp\u003E\u003Cp\u003EНо перед этим нам нужно разобраться с обслуживающими гранями, которые отвечают за изменение функциональности и мониторинг уже имеющихся граней и функциональности.\u003C\u002Fp\u003E\u003Cp\u003EЭти целям будет служить библиотека LibDiamond и три грани: DiamondCutFacet - для изменения функциональности, DiamondLoupeFacet - для мониторинга граней и функциональности контракта Diamond, OwnershipFacet - грань, которая помогает администрировать доступ к функции diamindCut, чтобы имплементации не менялись кем попало.\u003C\u002Fp\u003E\u003Cp\u003EРассмотрим код библиотеки LibDiamond, она будет дана в сокращенном виде, полный код будет в открытом доступе на github:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { IDiamond } from \"..\u002Finterfaces\u002FIDiamond.sol\";\nimport { IDiamondCut } from \"..\u002Finterfaces\u002FIDiamondCut.sol\";\n\nlibrary LibDiamond {\n\t\t\u002F\u002F номер слота, который является точкой входа для обращения DiamondStorage\n    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256(\"diamond.standard.diamond.storage\");\n\n    struct FacetAddressAndSelectorPosition {\n        address facetAddress; \u002F\u002F адрес грани\n        uint16 selectorPosition; \u002F\u002F индекс селектора в массиве bytes4[] selectors\n    }\n\n    struct DiamondStorage {\n        \u002F\u002F соответсвие селектор =\u003E информация по нему\n        mapping(bytes4 =\u003E FacetAddressAndSelectorPosition) facetAddressAndSelectorPosition;\n\t\t\t\t\u002F\u002F массив со всеми селекторами\n        bytes4[] selectors;\n        \u002F\u002F владелец Diamond, который может вызывать diamondCut\n        address contractOwner;\n    }\n\n\t\t\u002F\u002F функция для обращения к хранилищу\n    function diamondStorage() internal pure returns (DiamondStorage storage ds) {\n        bytes32 position = DIAMOND_STORAGE_POSITION;\n        assembly {\n            ds.slot := position\n        }\n    }\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n\n\t\t\u002F\u002F установить нового владельца\n    function setContractOwner(address _newOwner) internal {\n        DiamondStorage storage ds = diamondStorage();\n        address previousOwner = ds.contractOwner;\n        ds.contractOwner = _newOwner;\n        emit OwnershipTransferred(previousOwner, _newOwner);\n    }\n\n\t\t\u002F\u002F получить адрес владельца\n    function contractOwner() internal view returns (address contractOwner_) {\n        contractOwner_ = diamondStorage().contractOwner;\n    }\n\n\t\t\u002F\u002F проверка на то, что вызывающий является влдаельцем Diamond\n    function enforceIsContractOwner() internal view {\n        if(msg.sender != diamondStorage().contractOwner) {\n            revert NotContractOwner(msg.sender, diamondStorage().contractOwner);\n        }        \n    }\n\n    event DiamondCut(IDiamondCut.FacetCut[] _diamondCut, address _init, bytes _calldata);\n\n    \u002F\u002F основная функция с помощью которой изменяется весь функционал Diamond\n    function diamondCut(\n        IDiamondCut.FacetCut[] memory _diamondCut,\n        address _init,\n        bytes memory _calldata\n    ) internal {\n        for (uint256 facetIndex; facetIndex &lt; _diamondCut.length; facetIndex++) {\n            bytes4[] memory functionSelectors = _diamondCut[facetIndex].functionSelectors;\n            address facetAddress = _diamondCut[facetIndex].facetAddress;\n            if(functionSelectors.length == 0) {\n                revert NoSelectorsProvidedForFacetForCut(facetAddress);\n            }\n            IDiamondCut.FacetCutAction action = _diamondCut[facetIndex].action;\n            if (action == IDiamond.FacetCutAction.Add) {\n                addFunctions(facetAddress, functionSelectors);\n            } else if (action == IDiamond.FacetCutAction.Replace) {\n                replaceFunctions(facetAddress, functionSelectors);\n            } else if (action == IDiamond.FacetCutAction.Remove) {\n                removeFunctions(facetAddress, functionSelectors);\n            } else {\n                revert IncorrectFacetCutAction(uint8(action));\n            }\n        }\n        emit DiamondCut(_diamondCut, _init, _calldata);\n        initializeDiamondCut(_init, _calldata);\n    }\n\n\t\t\u002F\u002F функции добавления\u002Fзамены\u002Fудаления селекторов из граней\n    function addFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {        \n        \n    }\n    function replaceFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {        \n        \n    }\n    function removeFunctions(address _facetAddress, bytes4[] memory _functionSelectors) internal {        \n              \n    }\n\n\t\t\u002F\u002F функция вызываемая каждый раз в конце diamondCut, для инициализации каких-то переменных\n    function initializeDiamondCut(address _init, bytes memory _calldata) internal {\n        if (_init == address(0)) {\n            return;\n        }\n        enforceHasContractCode(_init, \"LibDiamondCut: _init address has no code\");        \n        (bool success, bytes memory error) = _init.delegatecall(_calldata);\n        if (!success) {\n            if (error.length \u003E 0) {\n                \u002F\u002F bubble up error\n                \u002F\u002F\u002F @solidity memory-safe-assembly\n                assembly {\n                    let returndata_size := mload(error)\n                    revert(add(32, error), returndata_size)\n                }\n            } else {\n                revert InitializationFunctionReverted(_init, _calldata);\n            }\n        }        \n    }\n\n\t\t\u002F\u002F проверка на то, что адрес является контрактом, а не адресом\n    function enforceHasContractCode(address _contract, string memory _errorMessage) internal view {\n        uint256 contractSize;\n        assembly {\n            contractSize := extcodesize(_contract)\n        }\n        if(contractSize == 0) {\n            revert NoBytecodeAtAddress(_contract, _errorMessage);\n        }        \n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EРассмотрим грань DiamondCutFacet, отвечающая за изменение функционала Diamond:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { IDiamondCut } from \"..\u002Finterfaces\u002FIDiamondCut.sol\";\n\u002F\u002F импортируем библиотеку, чтобы обращаться к ней и менять состояния хранилища\nimport { LibDiamond } from \"..\u002Flibraries\u002FLibDiamond.sol\";\n\ncontract DiamondCutFacet is IDiamondCut {\n    \n    function diamondCut(\n        FacetCut[] calldata _diamondCut,\n        address _init,\n        bytes calldata _calldata\n    ) external override {\n\t\t\t\t\u002F\u002F проверяем, что отправитель являеися владельцем Diamind\n        LibDiamond.enforceIsContractOwner();\n\t\t\t\t\u002F\u002F непосредтвенно вызываем diamondCut из библиотеки\n        LibDiamond.diamondCut(_diamondCut, _init, _calldata);\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EРассмотрим грань DiamondLoupeFacet, код будет показан в сокращенном виде, полный код можно посмотреть на github:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { LibDiamond } from  \"..\u002Flibraries\u002FLibDiamond.sol\";\nimport { IDiamondLoupe } from \"..\u002Finterfaces\u002FIDiamondLoupe.sol\";\n\ncontract DiamondLoupeFacet is IDiamondLoupe {\n    \n\t\t\u002F\u002F получение полной информации по всем граням, на которые может делегировать Diamond\n    function facets() external override view returns (Facet[] memory facets_) {\n        \u002F\u002F код функции\n    }\n\n\t\t\u002F\u002F получение селекторов всех функций грани, на которые делегирует Diamond\n    function facetFunctionSelectors(address _facet) external override view returns (bytes4[] memory _facetFunctionSelectors) {\n        \u002F\u002F код функции\n    }\n\n\t\t\u002F\u002F получение адресов всех граней\n    function facetAddresses() external override view returns (address[] memory facetAddresses_) {\n        \u002F\u002F код функции\n    }\n\n\t\t\u002F\u002F получение адреса грани по селектору, функция которого находится на этой грани\n    function facetAddress(bytes4 _functionSelector) external override view returns (address facetAddress_) {\n        \u002F\u002F код функции\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EПоследняя обязательная грань OwnershipFacet:  \u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { LibDiamond } from \"..\u002Flibraries\u002FLibDiamond.sol\";\n\ncontract OwnershipFacet {\n\t\t\u002F\u002F передача права вледения на Diamond другому адресу\n    function transferOwnership(address _newOwner) external {\n\t\t\t\t\u002F\u002F проверка на то, что отправитель владелец Diamond\n        LibDiamond.enforceIsContractOwner();\n\t\t\t\t\u002F\u002F установка нового владельца\n        LibDiamond.setContractOwner(_newOwner);\n    }\n\n\t\t\u002F\u002F view функция, которая возвращает адрес владельца Diamond\n    function owner() external view returns (address owner_) {\n        owner_ = LibDiamond.contractOwner();\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EНаконец рассмотрим сам контракт Diamond, а затем поймем как правильно и в каком порядке нужно деплоить Diamond и грани.\u003C\u002Fp\u003E\u003Cp\u003EКонтракт Diamond:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { LibDiamond } from \".\u002Flibraries\u002FLibDiamond.sol\";\nimport { IDiamondCut } from \".\u002Finterfaces\u002FIDiamondCut.sol\";\n\nerror FunctionNotFound(bytes4 _functionSelector);\n\nstruct DiamondArgs {\n    address owner;\n    address init;\n    bytes initCalldata;\n}\n\ncontract Diamond {    \n\n    constructor(IDiamondCut.FacetCut[] memory _diamondCut, DiamondArgs memory _args) payable {\n        LibDiamond.setContractOwner(_args.owner);\n        LibDiamond.diamondCut(_diamondCut, _args.init, _args.initCalldata);\n\t\t\t\t\u002F\u002F здесь может быть добавлен какой-то дополнительный код \n\t\t\t\t\u002F\u002F для инициализации каких-то переменных в сторадже\n    }\n\n    fallback() external payable {\n\t\t\t\t\u002F\u002F объявляем переменную хранилища\n        LibDiamond.DiamondStorage storage ds;\n        bytes32 position = LibDiamond.DIAMOND_STORAGE_POSITION;\n        \u002F\u002F получаем хранилище, указав слот, через который к хранилищу можно обратиться\n        assembly {\n            ds.slot := position\n        }\n        \u002F\u002F получаем адрес грани по селектору функции\n        address facet = ds.facetAddressAndSelectorPosition[msg.sig].facetAddress;\n\t\t\t\t\u002F\u002F если грань не была добавлена, возвращаем ошибку\n        if(facet == address(0)) { \n            revert FunctionNotFound(msg.sig);\n        }\n        \u002F\u002F вызываем функцию на грани и получаем назад какое-то значение\n        assembly {\n            calldatacopy(0, 0, calldatasize())\n            let result := delegatecall(gas(), facet, 0, calldatasize(), 0, 0)\n            returndatacopy(0, 0, returndatasize())\n            switch result\n                case 0 {\n                    revert(0, returndatasize())\n                }\n                default {\n                    return(0, returndatasize())\n                }\n        }\n    }\n\n    receive() external payable {}\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EПриступим к тестированию, полный код тестирования можно посмотреть также на github.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode class=\"typescript\"\u003Elet diamondCutFacet: DiamondCutFacet;\nlet diamondLoupeFacet: DiamondLoupeFacet;\nlet ownershipFacet: OwnershipFacet;\nlet constantsFacet: ConstantsFacet;\nlet balancesFacet: BalancesFacet;\nlet allowancesFacet: AllowancesFacet;\nlet supplyRegulatorFacet: SupplyRegulatorFacet;\n\ninterface FacetCut {\n    facetAddress: string,\n    action: FacetCutAction,\n    functionSelectors: string[]\n}\n\ninterface FacetToAddress {\n    [key: string]: string\n}\n\nlet diamondInit: DiamondInit;\n\nlet owner: SignerWithAddress, admin: SignerWithAddress, \nuser1: SignerWithAddress, user2: SignerWithAddress, user3: SignerWithAddress;\n\nconst totalSupply = parseEther('100000');\nconst transferAmount = parseEther('1000');\nconst name = \"Token Name\";\nconst symbol = \"SYMBOL\";\nconst decimals = 18;\n\nbeforeEach(async () =\u003E {\n    [owner, admin, user1, user2, user3] = await ethers.getSigners();\n});\n\nenum FacetCutAction {\n    Add,\n    Replace,\n    Remove\n}\n\nlet calldataAfterDeploy: string;\nlet addressDiamond: string;\n\nlet facetToAddressImplementation: FacetToAddress = {};\n\n\u002F\u002F массив с инструкциями по части добавления новых граней и селекторов\nlet facetCuts: FacetCut[] = [];\n\n\u002F\u002F обслуживающие грани и сам Diamond\n\nconst FacetNames = [\n    'DiamondCutFacet',\n    'DiamondLoupeFacet',\n    'OwnershipFacet'\n];\n\u002F\u002F сначала деплоим обслуживающие грани, без которых Diamond не сможет существовать как Diamond\n\u002F\u002F если эти грани уже задеплоены, они могут быть использованы повторно\nmocha.step(\"Деплой обязательных граней для обслуживания Diamond\", async function() {\n    for (const FacetName of FacetNames) {\n        const Facet = await ethers.getContractFactory(FacetName)\n        const facet = await Facet.deploy()\n        await facet.deployed();\n\t\t\t\t\u002F\u002F наполняем массив, указывая адрес грани, действие(добавить) и\n\t\t\t\t\u002F\u002F и массив с селекторами, которые были получены с помощью кастомного хелпера\n\t\t\t\t\u002F\u002F код также можно найти в проекте на github\n        facetCuts.push({\n          facetAddress: facet.address,\n          action: FacetCutAction.Add,\n          functionSelectors: getSelectors(facet)\n        });\n\t\t\t\t\u002F\u002F записываем имя грани и адрес, куда грань быда задеплоена\n        facetToAddressImplementation[FacetName] = facet.address;\n    };\n});\n\n\u002F\u002F деплой Diamond, в качестве аргумента передаем массив с инструкциями facetCuts\n\u002F\u002F и прочие аргументы в diamondArgs\nmocha.step(\"Деплой контракта Diamond\", async function () {\n    const diamondArgs = {\n        owner: owner.address, \u002F\u002F адрес владельца, который может менять имплементации\n        init: ethers.constants.AddressZero, \u002F\u002F нулевой адрес, так как нам ничего не нужно инициализировать\n        initCalldata: '0x00' \u002F\u002F пустая коллдата, так как нам ничего не нужно вызывать для инициализации\n    };\n    const Diamond = await ethers.getContractFactory('Diamond')\n    const diamond = await Diamond.deploy(facetCuts, diamondArgs)\n    await diamond.deployed();\n    addressDiamond = diamond.address;\n});\n\n\u002F\u002F созадем инстансы контрактов, но в качестве адреса указывваем адрем Diamond,\n\u002F\u002F так как для всех операция он является единственной точкой входа\nmocha.step(\"Инициализация обслуживающих контрактов\", async function () {\n    diamondCutFacet = await ethers.getContractAt('DiamondCutFacet', addressDiamond);\n    diamondLoupeFacet = await ethers.getContractAt('DiamondLoupeFacet', addressDiamond);\n    ownershipFacet = await ethers.getContractAt('OwnershipFacet', addressDiamond);\n});\n\n\u002F\u002F в последующих проверках обращаемся к грани DiamondLoupeFacet, \n\u002F\u002F чтобы убедиться, что обслуживающие грани были добавлены и что сама грань DiamondLoupeFacet\n\u002F\u002F работает корректно\nmocha.step(\"Убеждаемся в том, что адреса граней на контракте совпадают с теми, которые были получены при деплое имплементаций\", async function () {\n    const addresses = [];\n    for (const address of await diamondLoupeFacet.facetAddresses()) {\n        addresses.push(address)\n    }\n    assert.sameMembers(Object.values(facetToAddressImplementation), addresses)\n});\n\nmocha.step(\"Получим селекторы функций по адресам их граней\", async function () {\n    let selectors = getSelectors(diamondCutFacet)\n    let result = await diamondLoupeFacet.facetFunctionSelectors(facetToAddressImplementation['DiamondCutFacet'])\n    assert.sameMembers(result, selectors)\n    selectors = getSelectors(diamondLoupeFacet)\n    result = await diamondLoupeFacet.facetFunctionSelectors(facetToAddressImplementation['DiamondLoupeFacet'])\n    assert.sameMembers(result, selectors)\n    selectors = getSelectors(ownershipFacet)\n    result = await diamondLoupeFacet.facetFunctionSelectors(facetToAddressImplementation['OwnershipFacet'])\n    assert.sameMembers(result, selectors)\n});\n\nmocha.step(\"Получим адреса граней по селекторам, кторые относятся к этим граням\", async function () {\n    assert.equal(\n        facetToAddressImplementation['DiamondCutFacet'],\n        await diamondLoupeFacet.facetAddress('0x1f931c1c') \u002F\u002FdiamondCut(FacetCut[] calldata _diamondCut, address _init, bytes calldata _calldata)\n    )\n    assert.equal(\n        facetToAddressImplementation['DiamondLoupeFacet'],\n        await diamondLoupeFacet.facetAddress('0x7a0ed627') \u002F\u002F facets()\n    )\n    assert.equal(\n        facetToAddressImplementation['DiamondLoupeFacet'],\n        await diamondLoupeFacet.facetAddress('0xadfca15e') \u002F\u002F facetFunctionSelectors(address _facet)\n    )\n    assert.equal(\n        facetToAddressImplementation['OwnershipFacet'],\n        await diamondLoupeFacet.facetAddress('0xf2fde38b') \u002F\u002F transferOwnership(address _newOwner)\n    )\n});\n\nmocha.step(\"Трансфер права менять имплементации и обратно\", async function () {\n    await ownershipFacet.connect(owner).transferOwnership(admin.address);\n    assert.equal(await ownershipFacet.owner(), admin.address);\n    await ownershipFacet.connect(admin).transferOwnership(owner.address);\n    assert.equal(await ownershipFacet.owner(), owner.address);\n});\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EМы развернули базовую часть Diamond, которая необходима для управления имплементациями. Теперь реализуем на Diamond функционал токена ERC20, со всеми функциями, которые присущи этому стандарту.\u003C\u002Fp\u003E\u003Cp\u003EВсе хранилище токена будет разбито на три стораджа, к которым будут обращаться 4 грани, рассмотрим архитектуру граней и стораджей на диаграмме:\u003C\u002Fp\u003E\u003Cfigure class=\"full-width \"\u003E\u003Cimg src=\"https:\u002F\u002Fhabrastorage.org\u002Fr\u002Fw780q1\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F38c\u002Fcba\u002F803\u002F38ccba803d743f3a4ef96f5c3d841d52.jpg\" alt=\"Архитектура ERC20 в контексте нашего Diamond\" title=\"Архитектура ERC20 в контексте нашего Diamond\" width=\"4448\" height=\"2567\" data-src=\"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F38c\u002Fcba\u002F803\u002F38ccba803d743f3a4ef96f5c3d841d52.jpg\" data-blurred=\"true\"\u002F\u003E\u003Cfigcaption\u003EАрхитектура ERC20 в контексте нашего Diamond\u003C\u002Ffigcaption\u003E\u003C\u002Ffigure\u003E\u003Cp\u003EБиблиотека LibConstants будет отвечать за хранение таких констант токена, как name, symbol, decimals и адрес админа, которому будут доступны функции mint(), burn() из грани SupplyRegulatorFacet.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nerror NotTokenAdmin();\n\nlibrary LibConstants {\n\t\t\u002F\u002F слот, через который можно обратиться к ConstantsStates\n    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256(\"erc20.constants\");\n\n    event AdminshipTransferred(address indexed previousAdmin, address indexed newAdmin);\n\n\t\t\u002F\u002F переменные в хранилище \"erc20.constants\"\n    struct ConstantsStates {\n        string name;\n        string symbol;\n        uint8 decimals;\n        address admin;\n    }\n\n    function diamondStorage() internal pure returns (ConstantsStates storage ds) {\n        bytes32 position = DIAMOND_STORAGE_POSITION;\n        assembly {\n            ds.slot := position\n        }\n    }\n\n\t\t\u002F\u002F проверка на то, что отправитель является админом\n    function enforceIsTokenAdmin() internal view {\n        if(msg.sender != diamondStorage().admin) {\n            revert NotTokenAdmin();\n        }        \n    }\n\n\t\t\u002F\u002F функция установки нового админа\n    function setTokenAdmin(address _newAdmin) internal {\n        ConstantsStates storage ds = diamondStorage();\n        address previousAdmin = ds.admin;\n        ds.admin = _newAdmin;\n        emit AdminshipTransferred(previousAdmin, _newAdmin);\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EСледующая библиотека LibBalances отвечает за хранение балансов и сопутствующих функций:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nlibrary LibBalances {\n\t\t\u002F\u002F слот, через который можно обратиться к BalancesStates\n    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256(\"erc20.balances\");\n\n    event Transfer(address indexed from, address indexed to, uint256 value);\n\t\t\n\t\t\u002F\u002F переменные в хранилище \"erc20.balances\"\n    struct BalancesStates {\n        mapping(address =\u003E uint256) balances;\n        uint256 totalSupply;\n    }\n\n    function diamondStorage() internal pure returns (BalancesStates storage ds) {\n        bytes32 position = DIAMOND_STORAGE_POSITION;\n        assembly {\n            ds.slot := position\n        } \n    }\n\n\t\t\u002F\u002F внутренние функции transfer, mint, burn, взятые прямиком из стандарта erc20 от openzeppelin\n    function transfer(\n        address from,\n        address to,\n        uint256 amount\n    ) internal {\n        BalancesStates storage ds = diamondStorage();\n        require(from != address(0), \"ERC20: transfer from the zero address\");\n        require(to != address(0), \"ERC20: transfer to the zero address\");\n\n        uint256 fromBalance = ds.balances[from];\n        require(fromBalance \u003E= amount, \"ERC20: transfer amount exceeds balance\");\n        unchecked {\n            ds.balances[from] = fromBalance - amount;\n            ds.balances[to] += amount;\n        }\n        emit Transfer(from, to, amount);\n    }\n\n    function mint(address account, uint256 amount) internal {\n        BalancesStates storage ds = diamondStorage();\n        require(account != address(0), \"ERC20: mint to the zero address\");\n        ds.totalSupply += amount;\n        unchecked {\n            ds.balances[account] += amount;\n        }\n        emit Transfer(address(0), account, amount);\n    }\n\n    function burn(address account, uint256 amount) internal {\n        BalancesStates storage ds = diamondStorage();\n        require(account != address(0), \"ERC20: burn from the zero address\");\n        uint256 accountBalance = ds.balances[account];\n        require(accountBalance \u003E= amount, \"ERC20: burn amount exceeds balance\");\n        unchecked {\n            ds.balances[account] = accountBalance - amount;\n            ds.totalSupply -= amount;\n        }\n        emit Transfer(account, address(0), amount);\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EДля инициализации констант из библиотеки LibConstants нужен отдельный контракт с функцией инициализации, которая будет вызвана сразу после добавления грани в Diamond.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\n\u002F\u002F импорт библиотек, хранилище которых нужно проинициализировать\nimport { LibConstants } from \"..\u002Flibraries\u002FLibConstants.sol\";\nimport { LibBalances } from \"..\u002Flibraries\u002FLibBalances.sol\";\n\ncontract DiamondInit {    \n\t\t\u002F\u002F фунция инициализации переменных\n    function initERC20(string calldata _name, string calldata _symbol, uint8 _decimals, address _admin, uint256 _totalSupply) external {\n        LibConstants.ConstantsStates storage constantsStorage = LibConstants.diamondStorage();\n\t\t\t\t\u002F\u002F инициализируем переменные:\n        constantsStorage.name = _name;\n        constantsStorage.symbol = _symbol;\n        constantsStorage.decimals = _decimals;\n        constantsStorage.admin = _admin;\n\t\t\t\t\u002F\u002F формируем первоначальное предложение, обращаясь к соотвествующей библиотеке\n        LibBalances.mint(_admin, _totalSupply);\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EНаконец напишем контракт грани, которая будет возвращать некоторые константы, обращаясь к библиотеке LibConstants:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { LibConstants } from \"..\u002Flibraries\u002FLibConstants.sol\";\n\ncontract ConstantsFacet {\n\n\t\t\u002F\u002F обычные view функции присущие стандарту ERC20: name, symbol, decimals\n    function name() external view returns (string memory) {\n        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();\n        return ds.name;\n    }\n\n    function symbol() external view returns (string memory) {\n        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();\n        return ds.symbol;\n    }\n\n    function decimals() external view returns (uint8) {\n        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();\n        return ds.decimals;\n    }\n\n\t\t\u002F\u002F посмотреть текущего админа\n    function admin() external view returns (address) {\n        LibConstants.ConstantsStates storage ds = LibConstants.diamondStorage();\n        return ds.admin;\n    }\n\t\t\n\t\t\u002F\u002F функция передачи админских прав на токен\n    function transferAdminship(address _newAdmin) external {\n\t\t\t\t\u002F\u002F проверяем на то, что отправитель это текущий админ\n        LibConstants.enforceIsTokenAdmin();\n\t\t\t\t\u002F\u002Fустанавливаем нового админа\n        LibConstants.setTokenAdmin(_newAdmin);\n    } \n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EПродолжим тестирование, в ходе которого мы проинициализируем переменные хранилища, с помощью функции initERC20 из контракта DiamondInit, а также добавим новую грань ConstantsFacet:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode class=\"typescript\"\u003Emocha.step(\"Деплой контракта который инициализирует значения переменных для функций name(), symbol() и т. д. во время вызова функции diamondCut\", async function() {\n    const DiamondInit = await ethers.getContractFactory('DiamondInit');\n    diamondInit = await DiamondInit.deploy();\n    await diamondInit.deployed();\n});\n\nmocha.step(\"Формирование calldata, которая будет вызвана из Diamond через delegatecall для инициализации переменных, во время вызова функции diamondCut\", async function () {\n\t\t\u002F\u002F указываем значения, которые будут проинициализированы во время вызова функции initERC20\n    calldataAfterDeploy = diamondInit.interface.encodeFunctionData('initERC20', [\n        name,\n        symbol,\n        decimals,\n        admin.address,\n        totalSupply\n    ]);\n});\n\nmocha.step(\"Деплой имплементации(грани) с константами\", async function () {\n    const ConstantsFacet = await ethers.getContractFactory(\"ConstantsFacet\");\n    const constantsFacet = await ConstantsFacet.deploy();\n    constantsFacet.deployed();\n    const facetCuts = [{\n        facetAddress: constantsFacet.address,\n        action: FacetCutAction.Add,\n        functionSelectors: getSelectors(constantsFacet)\n    }];\n\t\t\u002F\u002F два последних аргумента: адрес контракта с функцией для инициализации, колдата для вызова этой функцией, которой есть эти значения\n    await diamondCutFacet.connect(owner).diamondCut(facetCuts, diamondInit.address, calldataAfterDeploy);\n    facetToAddressImplementation['ConstantsFacet'] = constantsFacet.address;\n});\n\n\u002F\u002F указываем в инстансе адрес Diamond, как точку входа\nmocha.step(\"Инициализация имплементации c константами\", async function () {\n    constantsFacet = await ethers.getContractAt('ConstantsFacet', addressDiamond);\n});\n\nmocha.step(\"Проверка констант на наличие\", async function () {\n    assert.equal(await constantsFacet.name(), \"Token Name\");\n    assert.equal(await constantsFacet.symbol(), symbol);\n    assert.equal(await constantsFacet.decimals(), decimals);\n    assert.equal(await constantsFacet.admin(), admin.address);\n});\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EНапишем ещё одну грань для нашего контракта, благодаря которой мы сможем вызывать функцию transfer и передавать наши токены другим адресам.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nimport { LibBalances } from \"..\u002Flibraries\u002FLibBalances.sol\";\n\ncontract BalancesFacet {\n\t\t\u002F\u002F реализация функций из стандарта erc20:\n    function totalSupply() external view returns (uint256) {\n        LibBalances.BalancesStates storage ds = LibBalances.diamondStorage();\n        return ds.totalSupply;\n    }\n\n    function balanceOf(address _account) external view returns (uint256) {\n        LibBalances.BalancesStates storage ds = LibBalances.diamondStorage();\n        return ds.balances[_account];\n    }\n\n    function transfer(address _to, uint256 _amount) external returns (bool) {\n        address owner = msg.sender;\n        LibBalances.transfer(owner, _to, _amount);\n        return true;\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EПродолжим тестирование в ходе которого в контракт будет добавлена грань BalancesFacet:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode class=\"typescript\"\u003E\u002F\u002F деплой грани BalancesFacet\nmocha.step(\"Деплой имплементации с функцией трансфера\", async function () {\n    const BalancesFacet = await ethers.getContractFactory(\"BalancesFacet\");\n    const balancesFacet = await BalancesFacet.deploy();\n    balancesFacet.deployed();\n    const facetCuts = [{\n        facetAddress: balancesFacet.address,\n        action: FacetCutAction.Add,\n        functionSelectors: getSelectors(balancesFacet)\n    }];\n\t\t\u002F\u002F добавление грани в контракт\n    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, \"0x00\");\n    facetToAddressImplementation['BalancesFacet'] = balancesFacet.address;\n});\n\n\u002F\u002F указываем инстансу адрес Diamond как точку входа\nmocha.step(\"Инициализация имплементации c балансами и трансфером\", async function () {\n    balancesFacet = await ethers.getContractAt('BalancesFacet', addressDiamond);\n});\n\n\u002F\u002F убеждаемся, что функции из грани работают\nmocha.step(\"Проверка view функции имплементации с балансами и трансфером\", async function () {\n    expect(await balancesFacet.totalSupply()).to.be.equal(totalSupply);\n    expect(await balancesFacet.balanceOf(admin.address)).to.be.equal(totalSupply);\n});\n\nmocha.step(\"Проверка трансфера\", async function () {\n    await balancesFacet.connect(admin).transfer(user1.address, transferAmount);\n    expect(await balancesFacet.balanceOf(admin.address)).to.be.equal(totalSupply.sub(transferAmount));\n    expect(await balancesFacet.balanceOf(user1.address)).to.be.equal(transferAmount);\n    await balancesFacet.connect(user1).transfer(admin.address, transferAmount);\n});\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EНаконец напишем грань, после добавления которой у нас будет полноценный erc20, а именно возможность апрувить токены и переводить их с другого адреса используя transferFrom, помимо самой грани нам ещё нужна библиотека для обслуживания хранилища, в котором будет записано, кто сколько кому заапрувил.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\nlibrary LibAllowances {\n\t\t\u002F\u002F слот, через который можно обратиться к AllowancesStates\n    bytes32 constant DIAMOND_STORAGE_POSITION = keccak256(\"erc20.allowances\");\n\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n\n\t\t\u002F\u002F переменные в хранилище \"erc20.allowances\"\n    struct AllowancesStates {\n        mapping(address =\u003E mapping(address =\u003E uint256)) allowances;\n    }\n\n    function diamondStorage() internal pure returns (AllowancesStates storage ds) {\n        bytes32 position = DIAMOND_STORAGE_POSITION;\n        assembly {\n            ds.slot := position\n        } \n    }\n\n\t\t\u002F\u002F функция апрува\n    function approve(\n        address _owner,\n        address _spender,\n        uint256 _amount\n    ) internal {\n        AllowancesStates storage ds = diamondStorage();\n        require(_owner != address(0), \"ERC20: approve from the zero address\");\n        require(_spender != address(0), \"ERC20: approve to the zero address\");\n\n        ds.allowances[_owner][_spender] = _amount;\n        emit Approval(_owner, _spender, _amount);\n    }\n\n\t\t\u002F\u002F функция, вызываемая после траты заапрувленной суммы\n    function spendAllowance(\n        address _owner,\n        address _spender,\n        uint256 _amount\n    ) internal {\n        AllowancesStates storage ds = diamondStorage();\n        uint256 currentAllowance = ds.allowances[_owner][_spender];\n        if (currentAllowance != type(uint256).max) {\n            require(currentAllowance \u003E= _amount, \"ERC20: insufficient allowance\");\n            unchecked {\n                approve(_owner, _spender, currentAllowance - _amount);\n            }\n        }\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003E Контракт грани:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\u002F\u002F импортируем библиотеки, к хранилищам которых нам нужно обратиться\nimport { LibBalances } from \"..\u002Flibraries\u002FLibBalances.sol\";\nimport { LibAllowances } from \"..\u002Flibraries\u002FLibAllowances.sol\";\n\ncontract AllowancesFacet {\n\t\t\u002F\u002F оставшиеся функции необходимые для реализации ERC20\n\t\t\u002F\u002F view функция для получения значения заапрувленной суммы\n    function allowance(address _owner, address _spender) external view returns (uint256) {\n        LibAllowances.AllowancesStates storage ds = LibAllowances.diamondStorage();\n        return ds.allowances[_owner][_spender];\n    }\n\n\t\t\u002F\u002F функция одобрения какой-то суммы на адрес\n    function approve(address _spender, uint256 _amount) external returns (bool) {\n        address owner = msg.sender;\n        LibAllowances.approve(owner, _spender, _amount);\n        return true;\n    }\n\n\t\t\u002F\u002F функция трансфера одобренной суммы\n    function transferFrom(\n        address _from,\n        address _to,\n        uint256 _amount\n    ) external returns (bool) {\n        address spender = msg.sender;\n        LibAllowances.spendAllowance(_from, spender, _amount);\n        LibBalances.transfer(_from, _to, _amount);\n        return true;\n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EВернемся к тестированию, добавим грань AllowancesFacet и проверим корректно ли она работает, порядок деплоя и добавления ничем не отличается от предыдущих граней:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode class=\"typescript\"\u003Emocha.step(\"Деплой имплементации с allowances\", async function () {\n    const AllowancesFacet = await ethers.getContractFactory(\"AllowancesFacet\");\n    const allowancesFacet = await AllowancesFacet.deploy();\n    allowancesFacet.deployed();\n    const facetCuts = [{\n        facetAddress: allowancesFacet.address,\n        action: FacetCutAction.Add,\n        functionSelectors: getSelectors(allowancesFacet)\n    }];\n    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, \"0x00\");\n    facetToAddressImplementation['ConstantsFacet'] = allowancesFacet.address;\n});\n\nmocha.step(\"Инициализация имплементации c балансами и трансфером allowance, approve, transferFrom и т. д.\", async function () {\n    allowancesFacet = await ethers.getContractAt('AllowancesFacet', addressDiamond);\n});\n\nmocha.step(\"Тестрирование функций allowance, approve, transferFrom\", async function () {\n    expect(await allowancesFacet.allowance(admin.address, user1.address)).to.equal(0);\n    const valueForApprove = parseEther(\"100\");\n    const valueForTransfer = parseEther(\"30\");\n    await allowancesFacet.connect(admin).approve(user1.address, valueForApprove);\n    expect(await allowancesFacet.allowance(admin.address, user1.address)).to.equal(valueForApprove);\n    await allowancesFacet.connect(user1).transferFrom(admin.address, user2.address, valueForTransfer);\n    expect(await balancesFacet.balanceOf(user2.address)).to.equal(valueForTransfer);\n    expect(await balancesFacet.balanceOf(admin.address)).to.equal(totalSupply.sub(valueForTransfer));\n    expect(await allowancesFacet.allowance(admin.address, user1.address)).to.equal(valueForApprove.sub(valueForTransfer));\n});\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EНапишем ещё одну грань, которая будет регулировать эмиссию токена, в ней будет две функции: mint и burn, их сможет вызывать только админ, который был проинициализирован в функции initERC20.\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode\u003E\u002F\u002F SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\u002F\u002F импорт нужных библиотек\nimport { LibBalances } from \"..\u002Flibraries\u002FLibBalances.sol\";\nimport { LibConstants } from \"..\u002Flibraries\u002FLibConstants.sol\";\n\ncontract SupplyRegulatorFacet {\n    \n    function mint(address _account, uint256 _amount) external {\n        LibConstants.enforceIsTokenAdmin(); \u002F\u002F проверка на то, что функцию вызывает админ\n        LibBalances.mint(_account, _amount);\n    }\n\n    function burn(address _account, uint256 _amount) external {\n        LibConstants.enforceIsTokenAdmin(); \u002F\u002F проверка на то, что функцию вызывает админ\n        LibBalances.burn(_account, _amount); \n    }\n}\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EПродолжим тестирование:\u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode class=\"typescript\"\u003Emocha.step(\"Деплой имплементации с mint и burn\", async function () {\n    const SupplyRegulatorFacet = await ethers.getContractFactory(\"SupplyRegulatorFacet\");\n    supplyRegulatorFacet = await SupplyRegulatorFacet.deploy();\n    supplyRegulatorFacet.deployed();\n    const facetCuts = [{\n        facetAddress: supplyRegulatorFacet.address,\n        action: FacetCutAction.Add,\n        functionSelectors: getSelectors(supplyRegulatorFacet)\n    }];\n    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, \"0x00\");\n    facetToAddressImplementation['SupplyRegulatorFacet'] = supplyRegulatorFacet.address;\n});\n\nmocha.step(\"Инициализация имплементации c функциями mint и burn\", async function () {\n    supplyRegulatorFacet = await ethers.getContractAt('SupplyRegulatorFacet', addressDiamond);\n});\n\nmocha.step(\"Проверка функций mint и burn\", async function () {\n    const mintAmount = parseEther('1000');\n    const burnAmount = parseEther('500');\n    await supplyRegulatorFacet.connect(admin).mint(user3.address, mintAmount);\n    expect(await balancesFacet.balanceOf(user3.address)).to.equal(mintAmount);\n    expect(await balancesFacet.totalSupply()).to.be.equal(totalSupply.add(mintAmount));\n    await supplyRegulatorFacet.connect(admin).burn(user3.address, burnAmount);\n    expect(await balancesFacet.balanceOf(user3.address)).to.equal(mintAmount.sub(burnAmount));\n    expect(await balancesFacet.totalSupply()).to.be.equal(totalSupply.add(mintAmount).sub(burnAmount));\n});\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EНа этом тестирование функционала ERC20 закончено и мы можем отметить что работает оно корректно. Но, что если мы хоти сделать Diamond не обновляемым, например, в процессе разработке мы пришли к какой-то стабильной версии контракт и нас больше нет необходимости вызывать функцию diamondCut? Для это мы просто удалим селектор функции diamondCut:  \u003C\u002Fp\u003E\u003Cpre\u003E\u003Ccode class=\"typescript\"\u003Emocha.step(\"Удаление функции diamondCut для дальнейшей неизменяемости\", async function () {\n    const facetCuts = [{\n        facetAddress: ethers.constants.AddressZero,\n        action: FacetCutAction.Remove,\n        functionSelectors: ['0x1f931c1c'] \u002F\u002FdiamondCut(FacetCut[] calldata _diamondCut, address _init, bytes calldata _calldata)\n    }];\n    await diamondCutFacet.connect(owner).diamondCut(facetCuts, ethers.constants.AddressZero, \"0x00\");\n});\u003C\u002Fcode\u003E\u003C\u002Fpre\u003E\u003Cp\u003EПосле выполнения этого действия контракт станет не обновляемым и статичным, так что будьте осторожны, если решитесь удалить функцию diamondCut из Diamond.\u003C\u002Fp\u003E\u003Ch2\u003EПослесловие\u003C\u002Fh2\u003E\u003Cp\u003EСсылка на видео-туториал и подробное объяснение: \u003Ca href=\"https:\u002F\u002Fwww.youtube.com\u002Fwatch?v=42TUqDW74v8\" rel=\"noopener noreferrer nofollow\"\u003Ehttps:\u002F\u002Fwww.youtube.com\u002Fwatch?v=42TUqDW74v8\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003Cp\u003EGitHub: \u003Ca href=\"https:\u002F\u002Fgithub.com\u002FdavydovMikhail\u002Fmulti-proxy-contract\" rel=\"noopener noreferrer nofollow\"\u003Ehttps:\u002F\u002Fgithub.com\u002FdavydovMikhail\u002Fmulti-proxy-contract\u003C\u002Fa\u003E\u003C\u002Fp\u003E\u003Cp\u003EОстались вопросы? С чем-то не согласны? Пишите комментарии\u003C\u002Fp\u003E\u003Cp\u003EПоддержать автора криптовалютой: 0x021Db128ceab47C66419990ad95b3b180dF3f91F\u003C\u002Fp\u003E\u003Cp\u003E\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E","tags":[{"titleHtml":"Diamond"},{"titleHtml":"прокси"},{"titleHtml":"мултипрокси"},{"titleHtml":"eip2535"},{"titleHtml":"Solidity"},{"titleHtml":"модульный смарт контракт"},{"titleHtml":"обновляемый контракт"}],"metadata":{"stylesUrls":[],"scriptUrls":[],"shareImageUrl":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fe07\u002F53a\u002F0d6\u002Fe0753a0d65dfa0cc4daf77a960d359d3.png","shareImageWidth":1200,"shareImageHeight":630,"vkShareImageUrl":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fe07\u002F53a\u002F0d6\u002Fe0753a0d65dfa0cc4daf77a960d359d3.png","schemaJsonLd":"{\"@context\":\"http:\\\u002F\\\u002Fschema.org\",\"@type\":\"Article\",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"https:\\\u002F\\\u002Fhabr.com\\\u002Fru\\\u002Fpost\\\u002F709642\\\u002F\"},\"headline\":\"Мульти-прокси смарт контракт стандарта EIP-2535 «Diamond»\",\"datePublished\":\"2023-01-09T14:27:48+03:00\",\"dateModified\":\"2023-01-10T04:01:48+03:00\",\"author\":{\"@type\":\"Person\",\"name\":\"Davidoff Mikhail\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Habr\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"https:\\\u002F\\\u002Fhabrastorage.org\\\u002Fwebt\\\u002Fa_\\\u002Flk\\\u002F9m\\\u002Fa_lk9mjkccjox-zccjrpfolmkmq.png\"}},\"description\":\"ВведениеСсылка на видео-туториал и подробное объяснениеGitHubВ этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Face...\",\"url\":\"https:\\\u002F\\\u002Fhabr.com\\\u002Fru\\\u002Fpost\\\u002F709642\\\u002F#post-content-body\",\"about\":[\"h_p2p\",\"h_programming\",\"h_solidity\",\"h_distributed_systems\",\"h_cryptocurrency\",\"f_develop\",\"f_admin\",\"f_popsci\"],\"image\":[\"https:\\\u002F\\\u002Fhabr.com\\\u002Fshare\\\u002Fpublication\\\u002F709642\\\u002Fab694783ad133c9e33671e4c0ec05226\\\u002F\",\"https:\\\u002F\\\u002Fhabrastorage.org\\\u002Fgetpro\\\u002Fhabr\\\u002Fupload_files\\\u002F49c\\\u002Fe9c\\\u002Fa37\\\u002F49ce9ca37f92e4074f49cf8818c3298e.png\",\"https:\\\u002F\\\u002Fhabrastorage.org\\\u002Fgetpro\\\u002Fhabr\\\u002Fupload_files\\\u002Fedf\\\u002Fff5\\\u002Fb61\\\u002Fedfff5b614d6d26fca15964d1737ae10.png\",\"https:\\\u002F\\\u002Fhabrastorage.org\\\u002Fgetpro\\\u002Fhabr\\\u002Fupload_files\\\u002F38c\\\u002Fcba\\\u002F803\\\u002F38ccba803d743f3a4ef96f5c3d841d52.jpg\"]}","metaDescription":"Введение Ссылка на видео-туториал и подробное объяснение GitHub В этом материале речь пойдет про стандарт EIP-2535, также широко известен как Diamond или Multi-Facet Proxy. Стандарт дает возможность...","mainImageUrl":null,"amp":true,"customTrackerLinks":[]},"polls":[],"commentsEnabled":true,"rulesRemindEnabled":false,"votesEnabled":true,"status":"published","plannedPublishTime":null,"checked":null,"hasPinnedComments":false,"format":null,"readingTime":28,"complexity":null,"isEditorial":false}},"articlesIds":{},"isLoading":false,"pagesCount":{},"route":{},"reasonsList":null,"view":"cards","lastVisitedRoute":{},"ssrCommentsArticleIds":[""],"karma":{"userReasonsList":null}},"authorContribution":{"authors":{}},"betaTest":{"currentAnnouncement":null,"announcements":{},"announcementCards":null,"announcementComments":{},"announcementCommentThreads":{},"announcementCommentingStatuses":{},"archivedList":[]},"authorStatistics":{"articleRefs":{},"articleIds":{},"pagesCount":{},"route":{},"viewsCount":[],"maxStatsCount":{}},"career":{"seoLandings":[{"title":"Blockchain разработчик","vacanciesCount":11,"itemUrl":"https:\u002F\u002Fcareer.habr.com\u002Fvacancies\u002Fblockchain_developer","itemHubs":["distributed_systems","cryptocurrency","solidity"]}],"hubs":"p2p,programming,solidity,distributed_systems,cryptocurrency"},"comments":{"articleComments":{},"articlePinnedComments":{},"searchCommentsResults":null,"pagesCount":null,"commentAccess":{},"scrollParents":{},"pageArticleComments":{"lastViewedComment":0,"postId":null,"lastCommentTimestamp":"","moderated":[],"moderatedIds":[],"commentRoute":""}},"companies":{"companyRefs":{},"companyIds":{},"companyTopIds":{},"pagesCount":{},"companyProfiles":{},"companiesCategories":[],"companiesCategoriesTotalCount":0,"companiesWidgets":{},"companiesWorkers":{},"companiesFans":{},"route":{},"isLoading":false,"companyWorkersLoading":false,"companyFansLoading":false,"vacancies":{},"companiesGalleries":{},"companiesBanners":{},"companiesLandingVacancies":{},"companiesTechnologies":{},"workplaceInfo":null},"companyAdmin":{"companyInfo":null,"companyInfoLoading":false,"faqArticles":null,"brandingPreviewImageUrl":null,"jivoStatus":0,"adminNotifications":null},"companiesContribution":{"hubs":{},"flows":{},"companyRefs":{}},"companyHubsContribution":{"contributionRefs":{"hubRefs":{},"hubIds":{}}},"conversation":{"messages":[],"respondent":null,"isLoadMore":false},"conversations":{"conversations":[],"unreadCount":0,"pagesCount":0},"desktopState":{"desktopFl":null,"desktopHl":null,"isChecked":false,"isLoginDemanded":false},"docs":{"menu":{},"articles":{},"mainMenu":[],"loading":{"main":false,"dropdown":false,"article":false}},"feature":{"isProbablyVisible":true},"flows":{"updates":{"countNewPostsBySubscription":null,"countNewPostsAll":28,"countNewNewsAll":12},"flows":[{"alias":"develop","id":"1","route":{"name":"FLOW_PAGE","params":{"flowName":"develop"}}},{"alias":"admin","id":"6","route":{"name":"FLOW_PAGE","params":{"flowName":"admin"}}},{"alias":"design","id":"2","route":{"name":"FLOW_PAGE","params":{"flowName":"design"}}},{"alias":"management","id":"3","route":{"name":"FLOW_PAGE","params":{"flowName":"management"}}},{"alias":"marketing","id":"4","route":{"name":"FLOW_PAGE","params":{"flowName":"marketing"}}},{"alias":"popsci","id":"7","route":{"name":"FLOW_PAGE","params":{"flowName":"popsci"}}}]},"global":{"isPwa":false,"device":"desktop","isHabrCom":true},"hubs":{"hubRefs":{},"hubIds":{},"pagesCount":{},"isLoading":false,"route":{}},"hubsBlock":{"hubRefs":{},"hubIds":{}},"i18n":{"fl":"ru","hl":"ru"},"info":{"infoPage":{},"isLoading":true},"location":{"urlStruct":{"protocol":null,"slashes":null,"auth":null,"host":null,"port":null,"hostname":null,"hash":null,"search":null,"query":{},"pathname":null,"path":null,"href":""}},"me":{"user":null,"uuid":null,"ppgDemanded":false,"karmaResetInfo":{"canReincarnate":null,"wasReincarnated":null,"currentScore":null},"notes":null},"modal":{"modals":[]},"mostReadingList":{"mostReadingListIds":[],"mostReadingListRefs":null,"promoPost":null},"ppa":{"articles":{},"card":null,"transactions":null,"totalTransactions":null,"isAccessible":null},"projectsBlocks":{"activeBlocks":{"salary":"project-block-article"}},"promoData":{"isLoading":false,"hasLoaded":false,"featurer":null,"megaposts":null,"promoLinks":null,"promoPosts":null},"pullRefresh":{"shouldRefresh":false},"sandbox":{"articleIds":[],"articleRefs":{},"pagesCount":null,"route":{},"lastVisitedRoute":{},"isLoading":false},"search":{"searchQueryError":null},"settingsOther":{"inputs":{"uiLang":{"errors":[],"ref":null,"value":""},"articlesLangEnglish":{"errors":[],"ref":null,"value":false},"articlesLangRussian":{"errors":[],"ref":null,"value":false},"agreement":{"errors":[],"ref":null,"value":false},"email":{"errors":[],"ref":null,"value":true},"digest":{"errors":[],"ref":null,"value":true}}},"similarList":{"similarListIds":[],"similarListRefs":null},"ssr":{"error":null,"isDataLoaded":false,"isDataLoading":false,"isHydrationFailed":false,"isServer":false},"stories":{"stories":[{"id":"story-256","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F9f9\u002Fe16\u002Faa3\u002F9f9e16aa3959d9417693b87b33b5960a.png","title":"Хабр Карьера","link":"https:\u002F\u002Fu.habr.com\u002FfWIWD"},"title":"Карьерная неделя с победителями рейтинга","lang":"ru","startTime":"2023-02-22T13:00:00+03:00","finishTime":"2023-02-27T12:43:00+03:00","slides":[{"id":"story-256_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F412\u002F447\u002Fe40\u002F412447e40a7f9d7d0bc3def931a8f531.png","button":null},{"id":"story-256_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fe5a\u002F945\u002F506\u002Fe5a94550609aa2470112448d69291f01.png","button":null},{"id":"story-256_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F68f\u002Ffd1\u002Fe00\u002F68ffd1e00991476e865643cfb0c1b7a3.png","button":{"title":"Перейти в канал","link":"https:\u002F\u002Fu.habr.com\u002FmZQU8","colorType":"light"}}]},{"id":"story-254","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F7ca\u002Fd19\u002F564\u002F7cad19564e3da01131c205970297efed.png","title":"Хабр Новости","link":"https:\u002F\u002Fu.habr.com\u002FW9ecI"},"title":"Снимок мощной солнечной вспышки","lang":"ru","startTime":"2023-02-22T12:10:00+03:00","finishTime":"2023-03-05T11:56:00+03:00","slides":[{"id":"story-254_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F1e5\u002F39c\u002Fd83\u002F1e539cd8310dbe3ebcb14cffc293a7ff.png","button":null},{"id":"story-254_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F0cd\u002F0a3\u002F1a9\u002F0cd0a31a9f2ad25a56848a8c6fa7860e.png","button":null},{"id":"story-254_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fd15\u002Faec\u002Fadd\u002Fd15aecadde84e134c75b642bdadad5f7.png","button":{"title":"Подробности","link":"https:\u002F\u002Fu.habr.com\u002FW9ecI","colorType":"light"}}]},{"id":"story-252","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Ff19\u002F48d\u002Fd15\u002Ff1948dd155701f88d36e11387c1660ef.png","title":"Geek Travel","link":"https:\u002F\u002Fu.habr.com\u002F9TZjL"},"title":"Где искать северное сияние в России","lang":"ru","startTime":"2023-02-21T11:35:00+03:00","finishTime":"2023-03-05T11:22:00+03:00","slides":[{"id":"story-252_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F506\u002F188\u002F83b\u002F50618883bc97ce517531018d3290d961.jpg","button":{"title":"К посту","link":"https:\u002F\u002Fu.habr.com\u002F9TZjL","colorType":"light"}},{"id":"story-252_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fe42\u002Fa71\u002Fe8e\u002Fe42a71e8eb5583814647f5ad55f9e0ae.jpg","button":null},{"id":"story-252_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F685\u002Fdbe\u002F4ff\u002F685dbe4ffe3940eca28ede7406898846.jpg","button":null},{"id":"story-252_4","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F383\u002F63b\u002F1f4\u002F38363b1f459d5daace0e4502f0780737.jpg","button":null},{"id":"story-252_5","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F32b\u002F665\u002F0c4\u002F32b6650c448d698b9ca4dba128afb56e.jpg","button":null},{"id":"story-252_6","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F95e\u002F0b2\u002F5be\u002F95e0b25be55ae919dbebbac6142e670d.jpg","button":null},{"id":"story-252_7","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F616\u002F1d4\u002Ff84\u002F6161d4f849be8d4e4aeee88ea2e3d572.jpg","button":null}]},{"id":"story-250","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F09c\u002F0f6\u002F15d\u002F09c0f615db74086a1611243d250411eb.png","title":"Хабр","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Fhabr\u002Fblog\u002F"},"title":"Лучшее из блогов компаний за неделю","lang":"ru","startTime":"2023-02-21T10:20:00+03:00","finishTime":"2023-02-28T15:20:00+03:00","slides":[{"id":"story-250_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Ff8d\u002F1f4\u002Fcc3\u002Ff8d1f4cc328fb5308a64c97976ad821a.jpg","button":null},{"id":"story-250_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fcf9\u002Fe08\u002F87e\u002Fcf9e0887eda5882faea090e93cfeb057.jpg","button":{"title":"Смотреть списки","link":"https:\u002F\u002Fu.habr.com\u002Fss-tt","colorType":"light"}},{"id":"story-250_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F8db\u002Faae\u002F8d4\u002F8dbaae8d401dc775493cce70e4096a89.jpg","button":{"title":"Как это было","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Fyandex\u002Fblog\u002F716524\u002F","colorType":"light"}},{"id":"story-250_4","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Ffe5\u002Fb10\u002F831\u002Ffe5b10831e5a6fbe445a2bd3de96c808.jpg","button":{"title":"Подробнее","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Fdododev\u002Fblog\u002F714512\u002F","colorType":"light"}},{"id":"story-250_5","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F0c7\u002Fd91\u002Ff10\u002F0c7d91f101a28ab92af503dd97e9a511.jpg","button":{"title":"Читать советы","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Fproductivity_inside\u002Fblog\u002F717108\u002F","colorType":"light"}},{"id":"story-250_6","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F4ea\u002F32a\u002F3dc\u002F4ea32a3dc44b42aaf23c65c43dde62b1.jpg","button":{"title":"Окунуться в прошлое","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Ftimeweb\u002Fblog\u002F714894\u002F","colorType":"light"}},{"id":"story-250_7","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F6f9\u002F3f3\u002F016\u002F6f93f30163ac0c7307ac32d74832049a.jpg","button":{"title":"Размышления","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Fcloud4y\u002Fblog\u002F715668\u002F","colorType":"light"}},{"id":"story-250_8","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F3e1\u002F35b\u002F17d\u002F3e135b17de83de5d5a9fd901e439221a.jpg","button":{"title":"Узнать больше","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Fruvds\u002Fblog\u002F714946\u002F","colorType":"light"}}]},{"id":"story-246","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fc41\u002F8cc\u002Fca9\u002Fc418ccca924faf05c11530c5071e627b.png","title":"Хабр Карьера","link":"https:\u002F\u002Fu.habr.com\u002Fitzp2022-new"},"title":"Зарплаты в IT во второй половине 2022","lang":"ru","startTime":"2023-02-20T11:05:00+03:00","finishTime":"2023-03-05T23:59:00+03:00","slides":[{"id":"story-246_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fbe2\u002F07d\u002F19f\u002Fbe207d19f3cdc4b89e3618025c071ea0.png","button":null},{"id":"story-246_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fcda\u002F93e\u002Fed7\u002Fcda93eed762714814ddfc51c4712f4ed.png","button":null},{"id":"story-246_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fb8a\u002Fde4\u002F87f\u002Fb8ade487fa6556af459e032adebf852d.png","button":null},{"id":"story-246_4","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F8f6\u002Fb32\u002F844\u002F8f6b328448ed968a18a60a0cd745bd34.png","button":{"title":"Подробнее","link":"https:\u002F\u002Fu.habr.com\u002Fitzp2022-new","colorType":"dark"}}]},{"id":"story-222","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F312\u002Fabe\u002Fd4c\u002F312abed4c2617f05f485c19ae101de7e.png","title":"Хабр","link":"https:\u002F\u002Fhabr.com\u002Fru\u002Fcompany\u002Fhabr\u002Fblog\u002F"},"title":"Любовь, Хабр и роботы","lang":"ru","startTime":"2023-02-14T09:00:14+03:00","finishTime":"2023-02-26T23:59:00+03:00","slides":[{"id":"story-222_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fd35\u002Fce5\u002F716\u002Fd35ce5716f14544be26d53e05dc155ab.jpg","button":null},{"id":"story-222_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F191\u002Fb9c\u002F449\u002F191b9c449738d2cb2333ffa8daa1bd39.jpg","button":{"title":"Читать переводы","link":"https:\u002F\u002Fu.habr.com\u002Fval1","colorType":"light"}},{"id":"story-222_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F7c6\u002F61d\u002F6d9\u002F7c661d6d915ca10f037ccc7307fa36ec.jpg","button":{"title":"Что получилось?","link":"https:\u002F\u002Fu.habr.com\u002Fval2","colorType":"light"}},{"id":"story-222_4","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F02c\u002F20a\u002Fa28\u002F02c20aa28f1e1cb7d70943bd96eb5ac7.jpg","button":{"title":"Созерцать","link":"https:\u002F\u002Fu.habr.com\u002Fval3","colorType":"light"}},{"id":"story-222_5","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fe94\u002F9d6\u002F03e\u002Fe949d603e63cf1c98dcc4597ba41abfa.jpg","button":{"title":"На свидание","link":"https:\u002F\u002Fu.habr.com\u002Fval4","colorType":"light"}},{"id":"story-222_6","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F7b0\u002F3b3\u002Fed9\u002F7b03b3ed931ce73a0cda771b5e39c813.jpg","button":{"title":"Нашёл?","link":"https:\u002F\u002Fu.habr.com\u002Fval5","colorType":"light"}},{"id":"story-222_7","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F594\u002Fff6\u002Fbad\u002F594ff6badc0503fa3ca0dffafc31d3a3.jpg","button":{"title":"И сколько же?","link":"https:\u002F\u002Fu.habr.com\u002Fval6","colorType":"light"}},{"id":"story-222_8","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F452\u002Ff87\u002F9aa\u002F452f879aaf0db9530f35204663ec00e6.jpg","button":{"title":"Глянуть код","link":"https:\u002F\u002Fu.habr.com\u002Fval7","colorType":"light"}}]},{"id":"story-186","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fb6b\u002F720\u002F180\u002Fb6b72018041811571246ddf5ef07bd33.png","title":"Сезоны Хабра","link":"https:\u002F\u002Fu.habr.com\u002Fstory_season-kuber"},"title":"Столкнуться с кубом","lang":"ru","startTime":"2023-02-01T11:30:00+03:00","finishTime":"2023-02-28T23:59:00+03:00","slides":[{"id":"story-186_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F2b0\u002F5e8\u002Fffb\u002F2b05e8ffb30634f0f7f5c9602d8e43e6.png","button":null},{"id":"story-186_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fdfb\u002F838\u002F9c1\u002Fdfb8389c197e915942f9144978b91ce4.png","button":null},{"id":"story-186_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F634\u002Fc42\u002Fdfd\u002F634c42dfddb260cdf37f9c9b9d3f34ea.png","button":null},{"id":"story-186_4","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F401\u002F9f5\u002F59e\u002F4019f559e6c090ded0b46d6deeb4883c.png","button":null},{"id":"story-186_5","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F82a\u002F9cd\u002Fa48\u002F82a9cda4870156765b749271aca48241.png","button":{"title":"Смотреть участников","link":"https:\u002F\u002Fu.habr.com\u002Fstory_season-kuber_members","colorType":"light"}}]},{"id":"story-152","author":{"logo":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fa49\u002F0d3\u002F609\u002Fa490d3609f29b6dfc53a7b88ab47ca64.png","title":"Хабр","link":"https:\u002F\u002Fu.habr.com\u002Fstory_HiM-anketa"},"title":"Сеньоры — очень странные люди","lang":"ru","startTime":"2023-01-23T11:00:00+03:00","finishTime":"2023-03-01T23:59:00+03:00","slides":[{"id":"story-152_1","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fbbb\u002F901\u002F063\u002Fbbb9010630ae483ed1f41ec4e2572c13.png","button":null},{"id":"story-152_2","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F4f8\u002F66c\u002F14f\u002F4f866c14f0ca8999334438d7f17c0e3a.png","button":null},{"id":"story-152_3","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F6b9\u002Fa07\u002Fa61\u002F6b9a07a612df213ac3a1c179301828df.png","button":null},{"id":"story-152_4","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Ff6b\u002Fadb\u002Fb99\u002Ff6badbb9969d7e34ef4f7492767c6a77.png","button":null},{"id":"story-152_5","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fd9c\u002F9ac\u002F878\u002Fd9c9ac878bec5b494699e0080dd2e813.png","button":null},{"id":"story-152_6","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fdb1\u002Faf9\u002Fc3b\u002Fdb1af9c3bb557f6cee698cf67610f977.png","button":null},{"id":"story-152_7","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002F5cf\u002Fbed\u002F65b\u002F5cfbed65bd20b7051b1aac2b9d6e807e.png","button":null},{"id":"story-152_8","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Ffa8\u002F251\u002F4a9\u002Ffa82514a9471cd455339e97178d8c021.png","button":null},{"id":"story-152_9","image":"https:\u002F\u002Fhabrastorage.org\u002Fgetpro\u002Fhabr\u002Fupload_files\u002Fbd5\u002F901\u002Fe95\u002Fbd5901e952d9cf638355a3cc8b0c0911.png","button":{"title":"Хочу помочь джуну","link":"https:\u002F\u002Fu.habr.com\u002Fstory_HiM-anketa","colorType":"light"}}]}]},"technotext":{"years":[],"technotextDocForNominees":null,"technotextDocForWinners":null,"technotextInfo":{},"technotextInfoLoading":false,"technotextWinners":{},"technotextWinnersLoading":false},"userHubsContribution":{"contributionRefs":{"hubRefs":{},"hubIds":{}}},"userInvites":{"availableInvites":0,"usedInvitesIds":[],"usedInvitesRefs":{},"usedInvitesPagesCount":0,"unusedInvitesIds":[],"unusedInvitesRefs":{},"unusedInvitesPagesCount":0},"userVotes":{"karmaVotesList":[],"karmaVotesPagesCount":null,"karmaVotesListLoading":false,"commentsVotesList":[],"commentsVotesPagesCount":null,"commentsVotesListLoading":false,"postsVotesList":[],"postsVotesPagesCount":null,"postsVotesListLoading":false,"userVotesList":[],"userVotesPagesCount":null,"userVotesListLoading":false},"users":{"authorRefs":{},"authorIds":{},"pagesCount":{},"authorProfiles":{},"userHubs":{},"userInvitations":{},"authorFollowers":{},"authorFollowed":{},"userSpecialization":{},"karmaStats":[],"statistics":null,"isLoading":false,"authorFollowersLoading":false,"authorFollowedLoading":false,"userHubsLoading":false,"userInvitationsLoading":false,"route":{}},"viewport":{"prevScrollY":{},"scrollY":0,"width":0},"tracker":{"items":{},"pagesCache":{},"markedViewedSilently":{},"markedRead":{},"unreadCounters":{"applications":null,"system":null,"mentions":null,"subscribers":null,"posts_and_comments":null},"unviewedCounters":{"applications":null,"system":null,"mentions":null,"subscribers":null,"posts_and_comments":null}}};(function(){var s;(s=document.currentScript||document.scripts[document.scripts.length-1]).parentNode.removeChild(s);}());</script>
+<script src="https://assets.habr.com/habr-web/js/chunk-vendors.2287bfbd.js" defer></script><script src="https://assets.habr.com/habr-web/js/7298.c8f1d73c.js" defer></script><script src="https://assets.habr.com/habr-web/js/app.58744b80.js" defer></script>
+
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-726094-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    </script>
+  
+  <script type="text/javascript" >
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(24049213, "init", {
+      defer:true,
+      trackLinks:true,
+      accurateTrackBounce:true,
+      webvisor:false,
+    });
+  </script>
+  <noscript>
+    <div>
+      <img src="https://mc.yandex.ru/watch/24049213" style="position:absolute; left:-9999px;" alt="" />
+    </div>
+  </noscript>
+  
+    <script type="text/javascript">
+      window.addEventListener('load', function () {
+        setTimeout(() => {
+          const img = new Image();
+          img.src = 'https://vk.com/rtrg?p=VK-RTRG-421343-57vKE';
+        }, 0);
+      });
+    </script>
+  
+<script src="/js/ads.js" onload="window['zhY4i4nJ9K'] = true"></script>
+</body>
+</html>
