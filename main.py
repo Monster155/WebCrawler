@@ -2,12 +2,15 @@ import urllib.error
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
-from natasha import Doc, Segmenter, NewsEmbedding, NewsMorphTagger
+from natasha import Doc, Segmenter, NewsEmbedding, NewsMorphTagger, MorphVocab
 
 is_skip_downloading = True
 
 files_folder = "pages/"
 index_file_name = "index.txt"
+
+all_tokens_file = "tokens.txt"
+lemmas_tokens_file = "lemmas.txt"
 
 """ task 1 """
 
@@ -40,9 +43,13 @@ if not is_skip_downloading:
 
 """ task 2 """
 
-pos_set = {''}
-pos_dict = {'SYM': [], 'PRON': [], 'SCONJ': [], 'INTJ': [], 'ADJ': [], 'NOUN': [], 'AUX': [], 'PROPN': [],
-                'PART': [], 'CCONJ': [], 'X': [], 'ADV': [], 'VERB': [], 'ADP': [], 'NUM': [], 'PUNCT': [], 'DET': []}
+useful_tags = ['ADJ', 'NOUN', 'PROPN', 'VERB']
+final_words_tokens = []
+
+segmenter = Segmenter()
+morph_vocab = MorphVocab()
+emb = NewsEmbedding()
+morph_tagger = NewsMorphTagger(emb)
 
 for i in range(0, 100):
     f = open(files_folder + str(i) + ".txt", 'r', encoding="utf-8")
@@ -60,38 +67,36 @@ for i in range(0, 100):
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     # drop blank lines
     text = ' '.join(chunk for chunk in chunks if chunk)
-    print(text)
-
-    segmenter = Segmenter()
-    emb = NewsEmbedding()
-    morph_tagger = NewsMorphTagger(emb)
 
     doc = Doc(text)
     doc.segment(segmenter)
     doc.tag_morph(morph_tagger)
 
     for t in doc.tokens:
-        pos_set.add(t.pos)
-        pos_dict[t.pos].append(t.text)
+        if useful_tags.__contains__(t.pos):
+            final_words_tokens.append(t)
 
-print(pos_set)
-print(pos_dict)
+for token in final_words_tokens:
+    token.lemmatize(morph_vocab)
+
+#
+
+
+all_lemmas = {}
+
+for token in final_words_tokens:
+    lemma = token.lemma.lower()
+    if lemma not in all_lemmas:
+        all_lemmas[lemma] = set()
+    all_lemmas[lemma].add(token.text.lower())
+
+with open(lemmas_tokens_file, 'w', encoding="utf-8") as lem_f:
+    with open(all_tokens_file, 'w', encoding="utf-8") as tot_f:
+        for key in all_lemmas.keys():
+            lem_f.write(key)
+            for s_el in all_lemmas[key]:
+                lem_f.write(" " + s_el)
+                tot_f.write(s_el + " ")
+            lem_f.write("\n")
 
 # https://melaniewalsh.github.io/Intro-Cultural-Analytics/05-Text-Analysis/13-POS-Keywords.html
-# SYM - symbol - символ
-# PRON - pronoun - местоимение
-# SCONJ - subordinating conjunction - подчинительный союз
-# INTJ - interjection - междометие
-# ADJ - adjective - прилагательное
-# NOUN - noun - существительное
-# AUX - auxiliary - вспомогательный
-# PROPN - proper noun - имя собственное
-# PART - particle - частица
-# CCONJ - coordinating conjunction - координирующее соединение
-# X - other - другой
-# ADV - adverb - наречие
-# VERB - verb - глагол
-# ADP - adposition - сближение
-# NUM - numeral - цифра
-# PUNCT - punctuation - пунктуация
-# DET - determiner - определитель
