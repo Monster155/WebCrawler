@@ -88,12 +88,12 @@ for i in range(0, 100):
 
     with open(tokens_tfidf_files_folder + str(i) + ".txt", 'w', encoding="utf-8") as f:
         for key in unique_tokens.keys():
-            f.write(key + " " + str(unique_tokens[key] / total_tokens_count)
-                    + " " + str(100 / len(all_tokens_indexes[key])) + "\n")
+            tf = unique_tokens[key] / total_tokens_count
+            f.write(key + " " + str(tf) + " " + str(tf * 100 / len(all_tokens_indexes[key])) + "\n")
     with open(lemmas_tfidf_files_folder + str(i) + ".txt", 'w', encoding="utf-8") as f:
         for key in unique_lemmas.keys():
-            f.write(key + " " + str(unique_lemmas[key] / total_tokens_count)
-                    + " " + str(100 / len(all_lemmas_indexes[key])) + "\n")
+            tf = unique_lemmas[key] / total_tokens_count
+            f.write(key + " " + str(tf) + " " + str(tf * 100 / len(all_lemmas_indexes[key])) + "\n")
 
 # tf = in 1 file = word count / all words
 # idf = in all files = all files / files with word
