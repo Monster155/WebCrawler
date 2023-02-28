@@ -29,18 +29,47 @@ if brackets_count > 0:
 if brackets_count < 0:
     search_request = ['('] * -brackets_count + search_request
 
+# () > not > and > or
+
+search_request_final = "("
 for i in range(0, len(search_request)):
     x = search_request[i].lower()
-    if x == 'and' or x == 'or' or x == 'not' or x == '(' or x == ')':
+    if x == 'and':
         search_request[i] = x
-        continue
-    doc = Doc(x)
-    doc.segment(segmenter)
-    doc.tag_morph(morph_tagger)
-    doc.tokens[0].lemmatize(morph_vocab)
-    search_request[i] = doc.tokens[0].lemma.lower()
+        search_request_final += ").intersection("
+    elif x == 'or':
+        search_request[i] = x
+        search_request_final += ").union("
+    elif x == 'not':
+        search_request[i] = x
+        search_request_final += ").difference("
+    elif x == '(':
+        search_request[i] = x
+        search_request_final += "("
+    elif x == ')':
+        search_request[i] = x
+        search_request_final += ")"
+    else:
+        doc = Doc(x)
+        doc.segment(segmenter)
+        doc.tag_morph(morph_tagger)
+        doc.tokens[0].lemmatize(morph_vocab)
+        lemma = doc.tokens[0].lemma.lower()
+        search_request[i] = lemma
+        if lemma in indexes.keys():
+            search_request_final += str(indexes[lemma])
+        else:
+            search_request_final += "set()"  # "{range(0, 100)}"
+search_request_final += ")"
 
-print(search_request)
+# print(search_request)
+# print(search_request_final)
+search_request_result = eval(search_request_final)
+
+if len(search_request_result) == 0:
+    print("Pages not found")
+else:
+    print(search_request_result)
 
 # pages_arr = []
 # if search_request[0] in indexes.keys() and search_request[2] in indexes.keys():
@@ -67,5 +96,3 @@ print(search_request)
 #     print("Pages not found")
 # else:
 #     print(set(pages_arr))
-
-# () > not > and > or
