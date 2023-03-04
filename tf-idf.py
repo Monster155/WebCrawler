@@ -87,13 +87,16 @@ for i in range(0, 100):
             unique_lemmas[lemma] += 1
 
     with open(tokens_tfidf_files_folder + str(i) + ".txt", 'w', encoding="utf-8") as f:
-        for key in unique_tokens.keys():
-            tf = unique_tokens[key] / total_tokens_count
+        for key in all_tokens_indexes.keys():
+            tf = unique_tokens[key] / total_tokens_count if key in unique_tokens.keys() else 0.0
             f.write(key + " " + str(tf) + " " + str(tf * 100 / len(all_tokens_indexes[key])) + "\n")
     with open(lemmas_tfidf_files_folder + str(i) + ".txt", 'w', encoding="utf-8") as f:
-        for key in unique_lemmas.keys():
-            tf = unique_lemmas[key] / total_tokens_count
+        for key in all_lemmas_indexes.keys():
+            tf = unique_lemmas[key] / total_tokens_count if key in unique_lemmas.keys() else 0.0
             f.write(key + " " + str(tf) + " " + str(tf * 100 / len(all_lemmas_indexes[key])) + "\n")
 
 # tf = in 1 file = word count / all words
 # idf = in all files = all files / files with word
+
+# получаем страницы при помощи булев поиска
+# векторным поиском выстраиваем в порядке убывания сходства
