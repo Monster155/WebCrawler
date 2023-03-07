@@ -8,11 +8,26 @@ from natasha import Doc, Segmenter, MorphVocab, NewsEmbedding, NewsMorphTagger
 from numpy import dot
 from numpy.linalg import norm
 
+#
+
+useful_tags = ['ADJ', 'NOUN', 'PROPN', 'VERB']
+
+segmenter = Segmenter()
+morph_vocab = MorphVocab()
+emb = NewsEmbedding()
+morph_tagger = NewsMorphTagger(emb)
+
+#
+
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 
 app = customtkinter.CTk()  # create CTk window like you do with the Tk window
 app.geometry("450x350")
+
+
+def open_link(link):
+    webbrowser.open(link)
 
 
 class MyFrame(customtkinter.CTkScrollableFrame):
@@ -25,11 +40,10 @@ class MyFrame(customtkinter.CTkScrollableFrame):
         for label in self.labels:
             label.destroy()
         self.labels = []
-        for link in links:
-            text_var = tkinter.StringVar(value=link)
-            label = customtkinter.CTkLabel(self, textvariable=text_var)
+        for i in range(0, len(links)):
+            link = links[i]
+            label = customtkinter.CTkButton(master=self, text=link, command=lambda: open_link(link))
             label.grid(row=len(self.labels), column=0, padx=20)
-            label.bind("<Button-1>", lambda e: webbrowser.open_new(link))
             self.labels.append(label)
 
 
@@ -63,9 +77,16 @@ class Searcher:
 
     def search(self, request):
 
-        # input text
-        search_request = request.split(' ')
-        search_request = list(filter(None, search_request))
+        doc = Doc(request)
+        doc.segment(segmenter)
+        doc.tag_morph(morph_tagger)
+
+        search_request = []
+
+        for token in doc.tokens:
+            if token.pos in useful_tags:
+                token.lemmatize(morph_vocab)
+                search_request.append(token.lemma.lower())
 
         # reset input words by lemmas
         unique_lemmas = {}
@@ -103,7 +124,8 @@ class Searcher:
                 continue
             results[i] = result
 
-        sorted_pages_indexes = sorted(results, reverse=True)
+        sorted_pages_indexes = sorted(results, reverse=False)
+        print("Pages:", sorted_pages_indexes)
         return [self.index_to_links[index] for index in sorted_pages_indexes]
 
 
